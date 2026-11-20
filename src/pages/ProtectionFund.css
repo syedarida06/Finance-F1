@@ -1,0 +1,272 @@
+
+.protection-page {
+  min-height: 100vh;
+  background: #f3f6f5;
+  color: #172d35;
+  font-family: Arial, sans-serif;
+  padding-bottom: 40px;
+}
+
+.protection-navbar {
+  background: #102d38;
+  color: white;
+  padding: 18px 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.protection-navbar h2 {
+  font-size: 25px;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.protection-navbar h2 span {
+  color: #35c6a0;
+}
+
+.protection-navbar a {
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.protection-navbar a:hover {
+  color: #35c6a0;
+}
+
+.protection-header {
+  background: #153b46;
+  color: white;
+  text-align: center;
+  padding: 55px 20px;
+}
+
+.protection-label {
+  color: #48d6b0;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.protection-header h1 {
+  font-size: 32px;
+  margin: 12px 0;
+}
+
+.protection-header > p:last-child {
+  max-width: 650px;
+  margin: 0 auto;
+  color: #d3e4e3;
+  line-height: 1.7;
+  font-size: 15px;
+}
+
+.protection-container {
+  width: 86%;
+  max-width: 1100px;
+  margin: 35px auto;
+}
+
+.protection-card {
+  background: white;
+  padding: 28px;
+  border-radius: 14px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 18px rgba(16, 45, 56, 0.06);
+}
+
+.protection-card h2 {
+  font-size: 21px;
+  color: #153b46;
+  margin-top: 0;
+}
+
+.protection-description {
+  color: #65777b;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+
+.protection-form {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.protection-form label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.protection-form input {
+  padding: 13px;
+  border: 1px solid #d5e0df;
+  border-radius: 7px;
+  outline: none;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.protection-form input:focus {
+  border-color: #21a98a;
+  box-shadow: 0 0 0 2px rgba(33, 169, 138, 0.1);
+}
+
+.protection-form button {
+  background: #159b7e;
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 7px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: 0.2s;
+}
+
+.protection-form button:hover {
+  background: #107d67;
+}
+
+.protection-results {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 25px;
+}
+
+.protection-result-card {
+  background: white;
+  padding: 23px;
+  border-radius: 12px;
+  border-left: 4px solid #21b995;
+  box-shadow: 0 4px 18px rgba(16, 45, 56, 0.05);
+}
+
+.protection-result-card p {
+  color: #65777b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.protection-result-card h2 {
+  color: #159b7e;
+  font-size: 25px;
+  margin: 12px 0;
+}
+
+.protection-result-card span {
+  color: #879496;
+  font-size: 12px;
+}
+
+.progress-card {
+  margin-bottom: 25px;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin: 22px 0 10px;
+  font-size: 14px;
+}
+
+.progress-info strong {
+  color: #159b7e;
+}
+
+.progress-track {
+  width: 100%;
+  height: 13px;
+  background: #e5eeeb;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #159b7e, #43d3ad);
+  border-radius: 20px;
+  transition: width 0.4s ease;
+}
+
+.progress-card > p {
+  color: #65777b;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+.protection-message {
+  background: #e5f7f0;
+  color: #14765f;
+  padding: 12px;
+  border-radius: 7px;
+  font-size: 14px;
+  margin-top: 18px;
+}
+
+.protection-tip {
+  background: #e1f3ed;
+  border-left: 4px solid #159b7e;
+  padding: 22px;
+  border-radius: 10px;
+  margin-top: 25px;
+}
+
+.protection-tip h3 {
+  color: #116b59;
+  margin-top: 0;
+}
+
+.protection-tip p {
+  color: #496762;
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+
+.protection-disclaimer {
+  text-align: center;
+  color: #7b8989;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 25px;
+}
+
+@media (max-width: 750px) {
+  .protection-results {
+    grid-template-columns: 1fr;
+  }
+
+  .protection-header h1 {
+    font-size: 25px;
+  }
+
+  .protection-container {
+    width: 92%;
+  }
+
+  .protection-card {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 450px) {
+  .protection-navbar {
+    padding: 16px 5%;
+  }
+
+  .protection-navbar h2 {
+    font-size: 21px;
+  }
+
+  .protection-navbar a {
+    font-size: 12px;
+  }
+}

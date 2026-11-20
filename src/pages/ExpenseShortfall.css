@@ -1,0 +1,270 @@
+
+.shortfall-page {
+  min-height: 100vh;
+  background: #f3f6f5;
+  color: #172b3a;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Navbar */
+
+.shortfall-navbar {
+  background: #102b3f;
+  padding: 19px 7%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.shortfall-logo {
+  color: #ffffff;
+  font-size: 27px;
+  font-weight: 800;
+  text-decoration: none;
+  letter-spacing: 1px;
+}
+
+.shortfall-logo span {
+  color: #24c6a5;
+}
+
+.shortfall-back {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.shortfall-back:hover {
+  color: #24c6a5;
+}
+
+/* Main Container */
+
+.shortfall-container {
+  width: 88%;
+  max-width: 1050px;
+  margin: 40px auto;
+}
+
+/* Heading */
+
+.shortfall-heading {
+  margin-bottom: 30px;
+}
+
+.shortfall-tag {
+  color: #159b83;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.shortfall-heading h1 {
+  font-size: 32px;
+  color: #102b3f;
+  margin: 10px 0;
+}
+
+.shortfall-heading > p:last-child {
+  color: #63727b;
+  font-size: 16px;
+  line-height: 1.7;
+  max-width: 750px;
+}
+
+/* Form Sections */
+
+.shortfall-form {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 5px 22px rgba(16, 43, 63, 0.06);
+}
+
+.shortfall-section {
+  margin-bottom: 32px;
+}
+
+.shortfall-section h2,
+.shortfall-summary h2 {
+  color: #102b3f;
+  font-size: 21px;
+  margin-bottom: 8px;
+}
+
+.shortfall-section > p {
+  color: #718087;
+  font-size: 14px;
+  margin-bottom: 22px;
+}
+
+.shortfall-input-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+}
+
+.shortfall-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.shortfall-field label {
+  font-size: 14px;
+  font-weight: 650;
+  color: #263f4d;
+}
+
+.shortfall-field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  border: 1px solid #d7e1df;
+  border-radius: 8px;
+  outline: none;
+  font-size: 15px;
+  color: #172b3a;
+  background: #fbfdfc;
+  transition: 0.2s;
+}
+
+.shortfall-field input:focus {
+  border-color: #19a88d;
+  box-shadow: 0 0 0 3px rgba(25, 168, 141, 0.12);
+}
+
+/* Submit Button */
+
+.shortfall-submit {
+  margin-top: 10px;
+}
+
+.shortfall-submit button {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  background: #159b83;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.shortfall-submit button:hover {
+  background: #107b6a;
+  transform: translateY(-1px);
+}
+
+/* Expense Overview */
+
+.shortfall-summary {
+  margin-top: 35px;
+}
+
+.shortfall-summary h2 {
+  margin-bottom: 18px;
+}
+
+.shortfall-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.shortfall-card {
+  background: #ffffff;
+  padding: 23px;
+  border-radius: 12px;
+  border-left: 4px solid #159b83;
+  box-shadow: 0 4px 15px rgba(16, 43, 63, 0.05);
+}
+
+.shortfall-card p {
+  color: #718087;
+  font-size: 14px;
+  margin: 0 0 10px;
+}
+
+.shortfall-card h3 {
+  color: #102b3f;
+  font-size: 25px;
+  margin: 0;
+}
+
+/* Result Alert */
+
+.shortfall-result {
+  margin-top: 28px;
+  padding: 25px;
+  border-radius: 12px;
+  line-height: 1.7;
+}
+
+.shortfall-result h2 {
+  font-size: 21px;
+  margin: 0 0 12px;
+}
+
+.shortfall-result h3 {
+  font-size: 25px;
+  margin: 15px 0;
+}
+
+.shortfall-result p {
+  font-size: 15px;
+  margin: 8px 0;
+}
+
+.shortfall-danger {
+  background: #fff0ed;
+  border: 1px solid #f2b9ad;
+  color: #963d30;
+}
+
+.shortfall-safe {
+  background: #e8f7f1;
+  border: 1px solid #a7ddc9;
+  color: #176b52;
+}
+
+.shortfall-advice {
+  font-weight: 600;
+}
+
+/* Responsive Design */
+
+@media (max-width: 650px) {
+  .shortfall-navbar {
+    padding: 17px 5%;
+  }
+
+  .shortfall-container {
+    width: 92%;
+    margin: 28px auto;
+  }
+
+  .shortfall-heading h1 {
+    font-size: 25px;
+  }
+
+  .shortfall-form {
+    padding: 20px;
+  }
+
+  .shortfall-input-grid,
+  .shortfall-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .shortfall-card h3 {
+    font-size: 22px;
+  }
+
+  .shortfall-back {
+    font-size: 13px;
+  }
+}

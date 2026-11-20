@@ -1,0 +1,315 @@
+
+* {
+  box-sizing: border-box;
+}
+
+.instability-page {
+  min-height: 100vh;
+  background: #f4f7f6;
+  color: #172b3a;
+  font-family: Arial, sans-serif;
+}
+
+.instability-navbar {
+  height: 75px;
+  padding: 0 7%;
+  background: #102c3a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.instability-logo {
+  color: #42c7ad;
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-decoration: none;
+}
+
+.instability-back {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+.instability-back:hover {
+  color: #42c7ad;
+}
+
+.instability-container {
+  width: 86%;
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 45px 0;
+}
+
+.instability-heading {
+  margin-bottom: 30px;
+}
+
+.instability-tag {
+  color: #159b83;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.instability-heading h1 {
+  margin: 12px 0;
+  font-size: 34px;
+  color: #102c3a;
+}
+
+.instability-heading p {
+  max-width: 720px;
+  color: #60717b;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.instability-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin: 30px 0;
+}
+
+.instability-card {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 13px;
+  border: 1px solid #e1eae7;
+  box-shadow: 0 5px 18px rgba(16, 44, 58, 0.05);
+}
+
+.instability-card span {
+  color: #60717b;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.instability-card h2 {
+  margin: 15px 0 8px;
+  font-size: 30px;
+  color: #102c3a;
+}
+
+.instability-card p {
+  margin: 0;
+  color: #84929a;
+  font-size: 13px;
+}
+
+.drop-value {
+  color: #d65b50 !important;
+}
+
+.stable-value {
+  color: #159b83 !important;
+}
+
+.instability-alert-section {
+  margin: 30px 0;
+}
+
+.instability-alert {
+  padding: 22px 25px;
+  border-radius: 12px;
+  border-left: 5px solid;
+}
+
+.instability-alert h3 {
+  margin: 0 0 10px;
+  font-size: 19px;
+}
+
+.instability-alert p {
+  margin: 0;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.warning-alert {
+  background: #fff1ed;
+  border-color: #d65b50;
+  color: #9c3f36;
+}
+
+.stable-alert {
+  background: #e8f7f2;
+  border-color: #159b83;
+  color: #176d5d;
+}
+
+.income-entry-section,
+.income-history-section {
+  background: #ffffff;
+  padding: 28px;
+  margin-top: 25px;
+  border-radius: 13px;
+  border: 1px solid #e1eae7;
+  box-shadow: 0 5px 18px rgba(16, 44, 58, 0.04);
+}
+
+.section-title h2 {
+  color: #102c3a;
+  font-size: 21px;
+  margin: 0 0 8px;
+}
+
+.section-title p {
+  color: #71818a;
+  font-size: 14px;
+  margin: 0 0 22px;
+}
+
+.income-entry-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+}
+
+.income-input-group {
+  flex: 1;
+}
+
+.income-input-group label {
+  display: block;
+  color: #344c59;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 9px;
+}
+
+.income-input-group input {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid #ccd9d5;
+  border-radius: 7px;
+  font-size: 15px;
+  outline: none;
+}
+
+.income-input-group input:focus {
+  border-color: #159b83;
+  box-shadow: 0 0 0 3px rgba(21, 155, 131, 0.1);
+}
+
+.income-entry-form button {
+  height: 48px;
+  padding: 0 24px;
+  background: #159b83;
+  border: none;
+  border-radius: 7px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.income-entry-form button:hover {
+  background: #107a69;
+}
+
+.empty-income {
+  padding: 35px 15px;
+  text-align: center;
+  background: #f7faf9;
+  border-radius: 9px;
+}
+
+.empty-income p {
+  color: #344c59;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.empty-income span {
+  color: #829099;
+  font-size: 14px;
+}
+
+.income-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.income-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.income-history-table th,
+.income-history-table td {
+  padding: 15px;
+  border-bottom: 1px solid #e8eeec;
+  font-size: 14px;
+}
+
+.income-history-table th {
+  background: #edf5f2;
+  color: #284653;
+  font-weight: 700;
+}
+
+.income-history-table td {
+  color: #526670;
+}
+
+.income-history-table tr:last-child td {
+  border-bottom: none;
+}
+
+.instability-note {
+  margin-top: 25px;
+  color: #829099;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .instability-container {
+    width: 92%;
+    padding: 30px 0;
+  }
+
+  .instability-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .instability-heading h1 {
+    font-size: 27px;
+  }
+
+  .income-entry-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .income-entry-form button {
+    width: 100%;
+  }
+
+  .instability-navbar {
+    padding: 0 5%;
+  }
+}
+
+@media (max-width: 480px) {
+  .instability-logo {
+    font-size: 22px;
+  }
+
+  .instability-back {
+    font-size: 13px;
+  }
+
+  .income-entry-section,
+  .income-history-section {
+    padding: 20px;
+  }
+}
