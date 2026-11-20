@@ -1,84 +1,197 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import "./ProtectionFund.css";
 
+const API_URL = "http://localhost:5000/api/features";
+
+const money = (value) =>
+  `₹${Number(value || 0).toLocaleString("en-IN", {
+    maximumFractionDigits: 2
+  })}`;
+
 function ProtectionFund() {
+  const navigate = useNavigate();
+
   const [income, setIncome] = useState("");
   const [expenses, setExpenses] = useState("");
-  const [balance, setBalance] = useState("");
   const [contribution, setContribution] = useState("");
   const [withdrawal, setWithdrawal] = useState("");
-  const [message, setMessage] = useState("");
 
   const [fundBalance, setFundBalance] = useState(0);
   const [hasCalculated, setHasCalculated] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const target = Number(expenses) * 3;
+  const target = Number(expenses || 0) * 3;
+
   const suggestedSaving = Math.max(
     0,
-    Number(income) - Number(expenses)
+    Number(income || 0) - Number(expenses || 0)
   );
 
   const progress =
-    target > 0
+    hasCalculated && target > 0
       ? Math.min((fundBalance / target) * 100, 100)
       : 0;
 
-  const calculateFund = () => {
-    if (
-      income === "" ||
-      expenses === "" ||
-      balance === "" ||
-      Number(income) < 0 ||
-      Number(expenses) < 0 ||
-      Number(balance) < 0
-    ) {
-      setMessage("Please enter valid income, expenses and fund balance.");
+  const fetchFundBalance = async () => {
+    const token = localStorage.getItem("finoraToken");
+
+    if (!token) {
+      navigate("/login", { replace: true });
       return;
     }
 
-    setFundBalance(Number(balance));
+    try {
+      const response = await fetch(`${API_URL}/fund`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.status === 401) {
+        localStorage.removeItem("finoraToken");
+        localStorage.removeItem("finoraUser");
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to load fund balance.");
+      }
+
+      setFundBalance(Number(data.balance || 0));
+    } catch (error) {
+      console.error("Fund loading error:", error);
+      setMessage(error.message || "Unable to load protection fund.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchFundBalance();
+  }, []);
+
+  const calculateFund = () => {
+    if (
+      income.trim() === "" ||
+      expenses.trim() === "" ||
+      !Number.isFinite(Number(income)) ||
+      !Number.isFinite(Number(expenses)) ||
+      Number(income) < 0 ||
+      Number(expenses) < 0
+    ) {
+      setMessage("Please enter valid monthly income and essential expenses.");
+      return;
+    }
+
     setHasCalculated(true);
     setMessage("Your protection fund plan has been calculated.");
   };
 
-  const updateFund = () => {
-    if (!hasCalculated) {
-      setMessage("Calculate your fund plan first.");
+  const updateFund = async () => {
+    const contributionAmount = Number(contribution);
+    const withdrawalAmount = Number(withdrawal);
+
+    if (contribution.trim() === "" && withdrawal.trim() === "") {
+      setMessage("Enter a contribution or withdrawal amount.");
       return;
     }
 
-    if (
-      contribution === "" ||
-      withdrawal === "" ||
-      Number(contribution) < 0 ||
-      Number(withdrawal) < 0
-    ) {
-      setMessage("Enter valid contribution and withdrawal amounts.");
+    if (contribution.trim() !== "" && withdrawal.trim() !== "") {
+      setMessage("Please submit a contribution or withdrawal separately.");
       return;
     }
 
-    if (Number(withdrawal) > fundBalance + Number(contribution)) {
+    const amount = contribution.trim() !== ""
+      ? contributionAmount
+      : withdrawalAmount;
+
+    const transactionType = contribution.trim() !== ""
+      ? "contribution"
+      : "withdrawal";
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setMessage("Enter a valid amount greater than zero.");
+      return;
+    }
+
+    if (transactionType === "withdrawal" && amount > fundBalance) {
       setMessage("Withdrawal cannot exceed your available fund balance.");
       return;
     }
 
-    const updated =
-      fundBalance +
-      Number(contribution) -
-      Number(withdrawal);
+    const token = localStorage.getItem("finoraToken");
 
-    setFundBalance(updated);
-    setContribution("");
-    setWithdrawal("");
-    setMessage("Your protection fund balance has been updated.");
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    setSaving(true);
+    setMessage("");
+
+    try {
+      const response = await fetch(`${API_URL}/fund`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          transaction_type: transactionType,
+          amount,
+          notes: transactionType === "contribution"
+            ? "Protection fund contribution"
+            : "Protection fund withdrawal"
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.status === 401) {
+        localStorage.removeItem("finoraToken");
+        localStorage.removeItem("finoraUser");
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(data.message || "Fund update failed.");
+      }
+
+      await fetchFundBalance();
+
+      setContribution("");
+      setWithdrawal("");
+
+      setMessage(
+        transactionType === "contribution"
+          ? "Contribution saved successfully."
+          : "Withdrawal saved successfully."
+      );
+
+    } catch (error) {
+      console.error("Fund update error:", error);
+      setMessage(error.message || "Unable to update protection fund.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <div className="protection-page">
+
       <nav className="protection-navbar">
-        <h2>FINORA<span>.</span></h2>
-        <a href="/user-dashboard">Back to Dashboard</a>
+        <Link to="/user-dashboard" className="protection-logo">
+          FINORA<span>.</span>
+        </Link>
+        <Link to="/user-dashboard">Back to Dashboard</Link>
       </nav>
 
       <section className="protection-header">
@@ -94,67 +207,74 @@ function ProtectionFund() {
 
         <div className="protection-card">
           <h2>Calculate Your Protection Fund</h2>
+
           <p className="protection-description">
-            Enter your monthly financial details to estimate
-            your personalised emergency savings target.
+            Enter your estimated monthly income and essential expenses
+            to calculate a personalised savings target.
           </p>
 
           <div className="protection-form">
-            <label>Monthly Income (₹)</label>
+
+            <label>Estimated Monthly Income (₹)</label>
             <input
               type="number"
               min="0"
+              step="0.01"
               placeholder="Enter monthly income"
               value={income}
-              onChange={(e) => setIncome(e.target.value)}
+              onChange={(e) => {
+                setIncome(e.target.value);
+                setHasCalculated(false);
+              }}
             />
 
             <label>Monthly Essential Expenses (₹)</label>
             <input
               type="number"
               min="0"
+              step="0.01"
               placeholder="Enter essential expenses"
               value={expenses}
-              onChange={(e) => setExpenses(e.target.value)}
+              onChange={(e) => {
+                setExpenses(e.target.value);
+                setHasCalculated(false);
+              }}
             />
 
-            <label>Current Protection Fund Balance (₹)</label>
+            <label>Actual Protection Fund Balance (₹)</label>
             <input
-              type="number"
-              min="0"
-              placeholder="Enter current savings"
-              value={balance}
-              onChange={(e) => setBalance(e.target.value)}
+              type="text"
+              value={loading ? "Loading..." : money(fundBalance)}
+              readOnly
             />
 
-            <button onClick={calculateFund}>
+            <button onClick={calculateFund} disabled={loading}>
               Calculate My Fund
             </button>
+
           </div>
         </div>
 
         <div className="protection-results">
+
           <div className="protection-result-card">
             <p>Recommended Fund Target</p>
-            <h2>₹{hasCalculated ? target.toLocaleString("en-IN") : "0"}</h2>
-            <span>Based on 3 months of essential expenses</span>
+            <h2>{hasCalculated ? money(target) : "—"}</h2>
+            <span>Three months of entered essential expenses</span>
           </div>
 
           <div className="protection-result-card">
             <p>Suggested Monthly Saving</p>
-            <h2>
-              ₹{hasCalculated
-                ? suggestedSaving.toLocaleString("en-IN")
-                : "0"}
-            </h2>
+            <h2>{hasCalculated ? money(suggestedSaving) : "—"}</h2>
             <span>Estimated surplus after essential expenses</span>
           </div>
 
           <div className="protection-result-card">
             <p>Available Fund Balance</p>
-            <h2>₹{fundBalance.toLocaleString("en-IN")}</h2>
-            <span>Your planned protection reserve</span>
+            <h2>{loading ? "..." : money(fundBalance)}</h2>
+            <span>Actual saved protection reserve</span>
           </div>
+
         </div>
 
         <div className="protection-card progress-card">
@@ -162,64 +282,78 @@ function ProtectionFund() {
 
           <div className="progress-info">
             <span>Current Savings</span>
-            <strong>{progress.toFixed(1)}%</strong>
+            <strong>
+              {hasCalculated ? `${progress.toFixed(1)}%` : "Calculate target first"}
+            </strong>
           </div>
 
           <div className="progress-track">
             <div
               className="progress-fill"
               style={{ width: `${progress}%` }}
-            ></div>
+            />
           </div>
 
           <p>
-            ₹{fundBalance.toLocaleString("en-IN")} saved out of
-            ₹{(hasCalculated ? target : 0).toLocaleString("en-IN")}
+            {money(fundBalance)} saved out of{" "}
+            {hasCalculated ? money(target) : "—"}
           </p>
         </div>
 
         <div className="protection-card">
           <h2>Manage Your Protection Fund</h2>
+
           <p className="protection-description">
-            Add savings during higher-income periods or record
-            a planned withdrawal during a lean month.
+            Record a contribution during higher-income periods
+            or a withdrawal when you need your reserve.
           </p>
 
           <div className="protection-form">
+
             <label>Contribution Amount (₹)</label>
             <input
               type="number"
               min="0"
+              step="0.01"
               placeholder="Enter amount to save"
               value={contribution}
-              onChange={(e) => setContribution(e.target.value)}
+              onChange={(e) => {
+                setContribution(e.target.value);
+                if (e.target.value) setWithdrawal("");
+              }}
             />
 
             <label>Withdrawal Amount (₹)</label>
             <input
               type="number"
               min="0"
+              step="0.01"
               placeholder="Enter amount to withdraw"
               value={withdrawal}
-              onChange={(e) => setWithdrawal(e.target.value)}
+              onChange={(e) => {
+                setWithdrawal(e.target.value);
+                if (e.target.value) setContribution("");
+              }}
             />
 
-            <button onClick={updateFund}>
-              Update Protection Fund
+            <button onClick={updateFund} disabled={saving || loading}>
+              {saving ? "Updating..." : "Update Protection Fund"}
             </button>
+
           </div>
 
           {message && (
-            <p className="protection-message">{message}</p>
+            <p className="protection-message" role="status">
+              {message}
+            </p>
           )}
         </div>
 
         <div className="protection-tip">
           <h3>FINORA Smart Tip</h3>
           <p>
-            Save a little more when earnings are higher.
-            During low-income months, use your reserve carefully
-            to help cover essential expenses.
+            Save more when earnings are higher. During low-income
+            months, use your reserve carefully to help cover essential expenses.
           </p>
         </div>
 

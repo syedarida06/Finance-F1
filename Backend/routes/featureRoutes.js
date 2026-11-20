@@ -10,30 +10,32 @@ const {
   addExpense,
   getExpenses,
   addInterruption,
+  getInterruptions,
   addFundTransaction,
   getFund,
   getIncomeStability
 } = require("../controllers/featureController");
 
-// All routes require login
+// All feature routes require authentication
 router.use(protect);
 
-// Income tracker
+// Income Tracker
 router.post("/income", addIncome);
 router.get("/income", getIncome);
 
-// Expense shortfall
+// Essential Expense Shortfall
 router.post("/expenses", addExpense);
 router.get("/expenses", getExpenses);
 
-// Emergency protection
+// Workday Loss & Emergency Protection
 router.post("/interruption", addInterruption);
+router.get("/interruption", getInterruptions);
 
-// Protection fund
+// Protection Fund
 router.post("/fund", addFundTransaction);
 router.get("/fund", getFund);
 
-// Income instability
+// Income Instability
 router.get("/income-stability", getIncomeStability);
 
 module.exports = router;

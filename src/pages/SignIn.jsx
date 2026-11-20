@@ -1,10 +1,11 @@
 
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./SignIn.css";
 
 function SignIn() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -12,6 +13,10 @@ function SignIn() {
   });
 
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(
+    location.state?.message || ""
+  );
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,7 +29,7 @@ function SignIn() {
     setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
@@ -32,15 +37,53 @@ function SignIn() {
       return;
     }
 
-    setError(
-      "Login is ready for backend integration. Your account will be verified once the backend is connected."
-    );
+    try {
+      setLoading(true);
+      setError("");
+      setSuccess("");
+
+      const response = await fetch(
+        "http://localhost:5000/api/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email.trim(),
+            password: formData.password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed.");
+      }
+
+      if (!data.token) {
+        throw new Error("Login succeeded but no authentication token was received.");
+      }
+
+      localStorage.setItem("finoraToken", data.token);
+
+      if (data.user) {
+        localStorage.setItem("finoraUser", JSON.stringify(data.user));
+      }
+
+      navigate("/user-dashboard");
+
+    } catch (err) {
+      setError(err.message || "Unable to connect to the server.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="signin-page">
 
-      {/* NAVBAR */}
       <nav className="signin-navbar">
 
         <Link to="/" className="signin-logo">
@@ -63,10 +106,8 @@ function SignIn() {
 
       </nav>
 
-      {/* MAIN CONTENT */}
       <main className="signin-main">
 
-        {/* LEFT INTRODUCTION */}
         <section className="signin-intro">
 
           <span className="signin-eyebrow">
@@ -117,7 +158,6 @@ function SignIn() {
 
         </section>
 
-        {/* SIGN IN FORM */}
         <section className="signin-card">
 
           <div className="signin-card-heading">
@@ -134,7 +174,6 @@ function SignIn() {
 
           <form onSubmit={handleSubmit}>
 
-            {/* EMAIL */}
             <div className="signin-field">
 
               <label htmlFor="email">
@@ -154,7 +193,6 @@ function SignIn() {
 
             </div>
 
-            {/* PASSWORD */}
             <div className="signin-field">
 
               <label htmlFor="password">
@@ -174,23 +212,31 @@ function SignIn() {
 
             </div>
 
-            {/* FORGOT PASSWORD */}
             <div className="signin-forgot">
               <Link to="/forgot-password">
                 Forgot Password?
               </Link>
             </div>
 
-            {/* ERROR MESSAGE */}
+            {success && (
+              <p className="signin-message" role="status">
+                {success}
+              </p>
+            )}
+
             {error && (
               <p className="signin-message" role="alert">
                 {error}
               </p>
             )}
 
-            {/* SUBMIT BUTTON */}
-            <button type="submit" className="signin-submit">
-              Sign In <span>→</span>
+            <button
+              type="submit"
+              className="signin-submit"
+              disabled={loading}
+            >
+              {loading ? "Signing In..." : "Sign In"}
+              {!loading && <span>→</span>}
             </button>
 
           </form>
@@ -213,7 +259,6 @@ function SignIn() {
 
       </main>
 
-      {/* FOOTER */}
       <footer className="signin-footer">
 
         <Link to="/" className="signin-logo">

@@ -1,47 +1,130 @@
 
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./IncomeInstability.css";
 
+const API_URL = "http://localhost:5000/api/features";
+
+function formatAmount(value) {
+  return Number(value || 0).toLocaleString("en-IN", {
+    maximumFractionDigits: 2,
+  });
+}
+
+function formatDate(date) {
+  if (!date) return "-";
+
+  const datePart = String(date).split("T")[0];
+  const parts = datePart.split("-");
+
+  if (parts.length === 3) {
+    return new Date(
+      Number(parts[0]),
+      Number(parts[1]) - 1,
+      Number(parts[2])
+    ).toLocaleDateString("en-IN");
+  }
+
+  return "-";
+}
+
 function IncomeInstability() {
-  const [income, setIncome] = useState("");
+  const navigate = useNavigate();
+
   const [records, setRecords] = useState([]);
+  const [averageIncome, setAverageIncome] = useState(0);
+  const [latestIncome, setLatestIncome] = useState(0);
+  const [hasAlert, setHasAlert] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const averageIncome =
-    records.length > 0
-      ? records.reduce((total, item) => total + item.amount, 0) /
-        records.length
-      : 0;
+  useEffect(() => {
+    const fetchIncomeAnalysis = async () => {
+      const token = localStorage.getItem("finoraToken");
 
-  const latestIncome =
-    records.length > 0 ? records[records.length - 1].amount : 0;
+      if (!token) {
+        navigate("/login", { replace: true });
+        return;
+      }
 
-  const incomeDrop =
-    averageIncome > 0
-      ? ((averageIncome - latestIncome) / averageIncome) * 100
-      : 0;
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
 
-  const hasAlert = records.length >= 2 && incomeDrop >= 20;
+      try {
+        const [incomeResponse, stabilityResponse] = await Promise.all([
+          fetch(`${API_URL}/income`, { headers }),
+          fetch(`${API_URL}/income-stability`, { headers }),
+        ]);
 
-  const addIncome = (e) => {
-    e.preventDefault();
+        if (
+          incomeResponse.status === 401 ||
+          stabilityResponse.status === 401
+        ) {
+          localStorage.removeItem("finoraToken");
+          localStorage.removeItem("finoraUser");
+          navigate("/login", { replace: true });
+          return;
+        }
 
-    const amount = Number(income);
+        const incomeData = await incomeResponse.json();
+        const stabilityData = await stabilityResponse.json();
 
-    if (!income || amount <= 0) {
-      alert("Please enter a valid daily income.");
-      return;
-    }
+        if (!incomeResponse.ok) {
+          throw new Error(incomeData.message || "Unable to load income history.");
+        }
 
-    const newRecord = {
-      id: Date.now(),
-      amount,
-      date: new Date().toLocaleDateString("en-IN"),
+        if (!stabilityResponse.ok) {
+          throw new Error(stabilityData.message || "Unable to analyse income.");
+        }
+
+        const savedRecords = Array.isArray(incomeData)
+          ? incomeData
+          : incomeData.records || incomeData.income || [];
+
+        const formattedRecords = savedRecords.map((item) => ({
+          id: item.id,
+          amount: Number(item.net_income ?? (
+            Number(item.delivery_earnings || 0) +
+            Number(item.incentives || 0) -
+            Number(item.fuel || 0) -
+            Number(item.maintenance || 0) -
+            Number(item.parking || 0) -
+            Number(item.mobile_data || 0) -
+            Number(item.other_expenses || 0)
+          )),
+          date: item.record_date || item.created_at,
+        }));
+
+        formattedRecords.sort(
+          (a, b) => String(a.date).localeCompare(String(b.date))
+        );
+
+        setRecords(formattedRecords);
+
+        setAverageIncome(Number(stabilityData.average_income || 0));
+        setLatestIncome(Number(stabilityData.latest_income || 0));
+
+        // Use the backend boolean, not the alert message string.
+        setHasAlert(stabilityData.has_alert === true);
+
+      } catch (err) {
+        console.error("Income stability error:", err);
+        setError(err.message || "Unable to analyse your income.");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    setRecords([...records, newRecord]);
-    setIncome("");
-  };
+    fetchIncomeAnalysis();
+  }, [navigate]);
+
+  const incomeChange =
+    averageIncome > 0
+      ? ((latestIncome - averageIncome) / averageIncome) * 100
+      : 0;
+
+  const dailyRecordsCount = records.length;
 
   return (
     <div className="instability-page">
@@ -65,116 +148,115 @@ function IncomeInstability() {
           </p>
         </section>
 
-        <section className="instability-stats">
-          <div className="instability-card">
-            <span>Average Daily Income</span>
-            <h2>₹{averageIncome.toFixed(0)}</h2>
-            <p>Based on your recorded entries</p>
+        {loading ? (
+          <p>Analysing your income records...</p>
+        ) : error ? (
+          <div className="instability-alert warning-alert">
+            <h3>Unable to Analyse Income</h3>
+            <p>{error}</p>
           </div>
+        ) : (
+          <>
+            <section className="instability-stats">
+              <div className="instability-card">
+                <span>Average Daily Income</span>
+                <h2>₹{formatAmount(averageIncome)}</h2>
+                <p>Based on recorded days in the last 30 days</p>
+              </div>
 
-          <div className="instability-card">
-            <span>Latest Daily Income</span>
-            <h2>₹{latestIncome.toFixed(0)}</h2>
-            <p>Most recently recorded income</p>
-          </div>
+              <div className="instability-card">
+                <span>Latest Daily Income</span>
+                <h2>₹{formatAmount(latestIncome)}</h2>
+                <p>Most recently recorded day</p>
+              </div>
 
-          <div className="instability-card">
-            <span>Income Change</span>
-            <h2 className={incomeDrop > 0 ? "drop-value" : "stable-value"}>
-              {records.length >= 2
-                ? `${incomeDrop > 0 ? "-" : "+"}${Math.abs(incomeDrop).toFixed(1)}%`
-                : "--"}
-            </h2>
-            <p>Compared with your average</p>
-          </div>
-        </section>
+              <div className="instability-card">
+                <span>Income Change</span>
+                <h2 className={incomeChange < 0 ? "drop-value" : "stable-value"}>
+                  {dailyRecordsCount >= 2
+                    ? `${incomeChange > 0 ? "+" : ""}${incomeChange.toFixed(1)}%`
+                    : "--"}
+                </h2>
+                <p>Compared with your 30-day average</p>
+              </div>
+            </section>
 
-        <section className="instability-alert-section">
-          {hasAlert ? (
-            <div className="instability-alert warning-alert">
-              <h3>⚠ Income Drop Detected</h3>
-              <p>
-                Your latest recorded income is{" "}
-                {incomeDrop.toFixed(1)}% below your average.
-                Consider reviewing your expenses and planning for
-                upcoming essential payments.
-              </p>
-            </div>
-          ) : (
-            <div className="instability-alert stable-alert">
-              <h3>✓ No Significant Income Drop Detected</h3>
-              <p>
-                {records.length < 2
-                  ? "Add at least two daily income records to start analysing your income pattern."
-                  : "Your latest income has not fallen by 20% or more compared with your recorded average."}
-              </p>
-            </div>
-          )}
-        </section>
+            <section className="instability-alert-section">
+              {hasAlert ? (
+                <div className="instability-alert warning-alert">
+                  <h3>⚠ Income Drop Detected</h3>
+                  <p>
+                    Your latest daily income is more than 30% below
+                    your recent average. Review your expenses and plan
+                    for upcoming essential payments.
+                  </p>
+                </div>
+              ) : (
+                <div className="instability-alert stable-alert">
+                  <h3>✓ No Significant Income Drop Detected</h3>
+                  <p>
+                    {dailyRecordsCount < 2
+                      ? "Add more daily income records through the Income Tracker to build your income history."
+                      : "Your latest recorded income has not triggered the instability alert."}
+                  </p>
+                </div>
+              )}
+            </section>
 
-        <section className="income-entry-section">
-          <div className="section-title">
-            <h2>Record Daily Income</h2>
-            <p>Enter your total earnings for each working day.</p>
-          </div>
+            <section className="income-entry-section">
+              <div className="section-title">
+                <h2>Record Daily Income</h2>
+                <p>
+                  Your income is retrieved automatically from your saved
+                  Income Tracker records.
+                </p>
+                <Link to="/income-tracker" className="instability-back">
+                  Go to Income Tracker →
+                </Link>
+              </div>
+            </section>
 
-          <form onSubmit={addIncome} className="income-entry-form">
-            <div className="income-input-group">
-              <label htmlFor="dailyIncome">Daily Income (₹)</label>
-              <input
-                id="dailyIncome"
-                type="number"
-                min="1"
-                step="0.01"
-                placeholder="Example: 850"
-                value={income}
-                onChange={(e) => setIncome(e.target.value)}
-                required
-              />
-            </div>
+            <section className="income-history-section">
+              <div className="section-title">
+                <h2>Income History</h2>
+                <p>Your saved daily net earnings.</p>
+              </div>
 
-            <button type="submit">Add Income Record</button>
-          </form>
-        </section>
-
-        <section className="income-history-section">
-          <div className="section-title">
-            <h2>Income History</h2>
-            <p>Your recorded daily earnings.</p>
-          </div>
-
-          {records.length === 0 ? (
-            <div className="empty-income">
-              <p>No income records yet.</p>
-              <span>Add your first daily income above to begin.</span>
-            </div>
-          ) : (
-            <div className="income-table-wrapper">
-              <table className="income-history-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Daily Income</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {records.map((record) => (
-                    <tr key={record.id}>
-                      <td>{record.date}</td>
-                      <td>₹{record.amount.toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
+              {records.length === 0 ? (
+                <div className="empty-income">
+                  <p>No income records yet.</p>
+                  <span>
+                    Add your first daily income through the Income Tracker.
+                  </span>
+                </div>
+              ) : (
+                <div className="income-table-wrapper">
+                  <table className="income-history-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Daily Net Income</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {records.map((record, index) => (
+                        <tr key={record.id || `${record.date}-${index}`}>
+                          <td>{formatDate(record.date)}</td>
+                          <td>₹{formatAmount(record.amount)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          </>
+        )}
 
         <p className="instability-note">
-          Note: This is an initial income-monitoring prototype. Its
-          analysis uses the records entered on this page and is not yet
-          connected to a database.
+          Note: FINORA analyses your saved daily income records over the
+          last 30 days. An alert is generated when the latest daily income
+          is more than 30% below the average.
         </p>
       </main>
     </div>

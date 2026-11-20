@@ -1,8 +1,11 @@
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./SignUp.css";
 
 function SignUp() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -15,6 +18,7 @@ function SignUp() {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,7 +32,7 @@ function SignUp() {
     setSuccess("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!/^[0-9]{10}$/.test(formData.phone)) {
@@ -46,15 +50,55 @@ function SignUp() {
       return;
     }
 
-    setSuccess(
-      "Your details are valid! Backend integration is required to create your account."
-    );
+    try {
+      setLoading(true);
+      setError("");
+      setSuccess("");
+
+      const response = await fetch(
+        "http://localhost:5000/api/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            full_name: formData.fullName.trim(),
+            email: formData.email.trim(),
+            phone: formData.phone,
+            platform: formData.platform,
+            city: formData.city.trim(),
+            password: formData.password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Registration failed.");
+      }
+
+      setSuccess("Account created successfully! Redirecting to Sign In...");
+
+      setTimeout(() => {
+        navigate("/login", {
+          state: {
+            message: "Registration successful! Please sign in.",
+          },
+        });
+      }, 1000);
+
+    } catch (err) {
+      setError(err.message || "Unable to connect to the server.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="signup-page">
 
-      {/* NAVBAR */}
       <nav className="signup-navbar">
         <a href="/" className="signup-logo">
           FINORA<span>.</span>
@@ -74,10 +118,8 @@ function SignUp() {
         </div>
       </nav>
 
-      {/* SIGNUP CONTENT */}
       <main className="signup-main">
 
-        {/* LEFT INTRODUCTION */}
         <section className="signup-intro">
           <span className="signup-eyebrow">
             WELCOME TO FINORA
@@ -120,7 +162,6 @@ function SignUp() {
           </div>
         </section>
 
-        {/* REGISTRATION FORM */}
         <section className="signup-card">
 
           <div className="signup-card-heading">
@@ -258,8 +299,13 @@ function SignUp() {
               </p>
             )}
 
-            <button type="submit" className="signup-submit">
-              Create Account <span>→</span>
+            <button
+              type="submit"
+              className="signup-submit"
+              disabled={loading}
+            >
+              {loading ? "Creating Account..." : "Create Account"}
+              {!loading && <span>→</span>}
             </button>
 
           </form>
@@ -277,7 +323,6 @@ function SignUp() {
         </section>
       </main>
 
-      {/* FOOTER */}
       <footer className="signup-footer">
         <a href="/" className="signup-logo">
           FINORA<span>.</span>

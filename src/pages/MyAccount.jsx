@@ -1,87 +1,102 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./MyAccount.css";
+
+const API_URL = "http://localhost:5000/api/users";
 
 function MyAccount() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const initialTab = location.state?.tab || "profile";
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const requestedTab = location.state?.tab;
+  const [activeTab, setActiveTab] = useState(
+    requestedTab === "settings" ? "settings" : "profile"
+  );
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [profile, setProfile] = useState({
-    name: "Delivery Partner",
+    name: "",
     phone: "",
     email: "",
     city: "",
-    platform: "Swiggy",
+    platform: "",
+    memberSince: "",
   });
 
-  const [editing, setEditing] = useState(false);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem("finoraToken");
 
-  const [settings, setSettings] = useState({
-    emailNotifications: true,
-    incomeAlerts: true,
-    expenseAlerts: true,
-    fundReminders: true,
-  });
+      if (!token) {
+        navigate("/login", { replace: true });
+        return;
+      }
 
-  const [passwords, setPasswords] = useState({
-    current: "",
-    new: "",
-    confirm: "",
-  });
+      try {
+        const response = await fetch(`${API_URL}/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-  const [message, setMessage] = useState("");
+        const data = await response.json().catch(() => ({}));
 
-  const handleProfileChange = (e) => {
-    setProfile({ ...profile, [e.target.name]: e.target.value });
-  };
+        if (response.status === 401) {
+          localStorage.removeItem("finoraToken");
+          localStorage.removeItem("finoraUser");
+          navigate("/login", { replace: true });
+          return;
+        }
 
-  const handlePasswordChange = (e) => {
-    setPasswords({ ...passwords, [e.target.name]: e.target.value });
-  };
+        if (!response.ok) {
+          throw new Error(data.message || "Unable to load your profile.");
+        }
 
-  const saveProfile = (e) => {
-    e.preventDefault();
-    setEditing(false);
-    setMessage("Profile updated successfully!");
-  };
+        const user = data.user;
 
-  const updatePassword = (e) => {
-    e.preventDefault();
+        if (!user) {
+          throw new Error("Profile information was not returned.");
+        }
 
-    if (!passwords.current || !passwords.new || !passwords.confirm) {
-      setMessage("Please fill in all password fields.");
-      return;
-    }
+        setProfile({
+          name: user.full_name || "",
+          phone: user.phone || "",
+          email: user.email || "",
+          city: user.city || "",
+          platform: user.platform || "",
+          memberSince: user.created_at
+            ? new Date(user.created_at).toLocaleDateString("en-IN", {
+                month: "long",
+                year: "numeric",
+              })
+            : "Not available",
+        });
+      } catch (err) {
+        setError(err.message || "Unable to load your account.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (passwords.new.length < 8) {
-      setMessage("New password must contain at least 8 characters.");
-      return;
-    }
+    fetchProfile();
+  }, [navigate]);
 
-    if (passwords.new !== passwords.confirm) {
-      setMessage("New passwords do not match.");
-      return;
-    }
-
-    setMessage(
-      "Password UI validated. Connect the backend to securely change your password."
-    );
-    setPasswords({ current: "", new: "", confirm: "" });
-  };
-
-  const toggleSetting = (key) => {
-    setSettings({ ...settings, [key]: !settings[key] });
+  const logout = () => {
+    localStorage.removeItem("finoraToken");
+    localStorage.removeItem("finoraUser");
+    navigate("/login", { replace: true });
   };
 
   return (
     <div className="account-page">
-
       <nav className="account-navbar">
-        <div className="account-logo" onClick={() => navigate("/user-dashboard")}>
+        <div
+          className="account-logo"
+          onClick={() => navigate("/user-dashboard")}
+        >
           FINORA<span>.</span>
         </div>
 
@@ -94,276 +109,156 @@ function MyAccount() {
       </nav>
 
       <main className="account-container">
-
         <div className="account-heading">
           <p className="account-eyebrow">YOUR ACCOUNT</p>
           <h1>Manage Your Account</h1>
-          <p>Manage your personal information and account preferences.</p>
+          <p>
+            View your registered information and manage your account access.
+          </p>
         </div>
 
-        <div className="account-layout">
+        {loading ? (
+          <p>Loading your account...</p>
+        ) : error ? (
+          <div className="account-message">{error}</div>
+        ) : (
+          <div className="account-layout">
+            <aside className="account-sidebar">
+              <div className="account-avatar">
+                {profile.name.trim().charAt(0).toUpperCase() || "U"}
+              </div>
 
-          <aside className="account-sidebar">
+              <h3>{profile.name || "Delivery Partner"}</h3>
+              <p>{profile.email || "No email available"}</p>
 
-            <div className="account-avatar">
-              {profile.name.charAt(0).toUpperCase()}
-            </div>
+              <button
+                className={
+                  activeTab === "profile"
+                    ? "account-tab active"
+                    : "account-tab"
+                }
+                onClick={() => setActiveTab("profile")}
+              >
+                <span>👤</span> My Profile
+              </button>
 
-            <h3>{profile.name}</h3>
-            <p>{profile.email || "Your FINORA account"}</p>
+              <button
+                className={
+                  activeTab === "settings"
+                    ? "account-tab active"
+                    : "account-tab"
+                }
+                onClick={() => setActiveTab("settings")}
+              >
+                <span>⚙️</span> Account Settings
+              </button>
+            </aside>
 
-            <button
-              className={activeTab === "profile" ? "account-tab active" : "account-tab"}
-              onClick={() => {
-                setActiveTab("profile");
-                setMessage("");
-              }}
-            >
-              <span>👤</span> My Profile
-            </button>
-
-            <button
-              className={activeTab === "settings" ? "account-tab active" : "account-tab"}
-              onClick={() => {
-                setActiveTab("settings");
-                setMessage("");
-              }}
-            >
-              <span>⚙️</span> Account Settings
-            </button>
-
-          </aside>
-
-          <section className="account-content">
-
-            {message && (
-              <div className="account-message">{message}</div>
-            )}
-
-            {activeTab === "profile" && (
-              <div className="profile-section">
-
-                <div className="section-heading">
-                  <div>
-                    <h2>My Profile</h2>
-                    <p>Your personal and delivery information.</p>
+            <section className="account-content">
+              {activeTab === "profile" && (
+                <div className="profile-section">
+                  <div className="section-heading">
+                    <div>
+                      <h2>My Profile</h2>
+                      <p>Your registered personal and delivery information.</p>
+                    </div>
                   </div>
 
-                  <button
-                    className="edit-profile-btn"
-                    onClick={() => {
-                      setEditing(!editing);
-                      setMessage("");
-                    }}
-                  >
-                    {editing ? "Cancel Editing" : "✎ Edit Profile"}
-                  </button>
-                </div>
-
-                <form onSubmit={saveProfile}>
-
                   <div className="profile-fields">
-
                     <div className="account-field">
                       <label>Full Name</label>
-                      <input
-                        name="name"
-                        value={profile.name}
-                        onChange={handleProfileChange}
-                        disabled={!editing}
-                        required
-                      />
+                      <input value={profile.name} readOnly />
                     </div>
 
                     <div className="account-field">
                       <label>Phone Number</label>
-                      <input
-                        name="phone"
-                        type="tel"
-                        value={profile.phone}
-                        onChange={handleProfileChange}
-                        disabled={!editing}
-                        placeholder="Enter phone number"
-                      />
+                      <input value={profile.phone} readOnly />
                     </div>
 
                     <div className="account-field">
                       <label>Email Address</label>
-                      <input
-                        name="email"
-                        type="email"
-                        value={profile.email}
-                        onChange={handleProfileChange}
-                        disabled={!editing}
-                        placeholder="Enter email address"
-                      />
+                      <input value={profile.email} readOnly />
                     </div>
 
                     <div className="account-field">
                       <label>City</label>
-                      <input
-                        name="city"
-                        value={profile.city}
-                        onChange={handleProfileChange}
-                        disabled={!editing}
-                        placeholder="Enter your city"
-                      />
+                      <input value={profile.city || "Not provided"} readOnly />
                     </div>
 
                     <div className="account-field full-field">
                       <label>Delivery Platform</label>
-                      <select
-                        name="platform"
-                        value={profile.platform}
-                        onChange={handleProfileChange}
-                        disabled={!editing}
-                      >
-                        <option>Swiggy</option>
-                        <option>Zomato</option>
-                        <option>Zepto</option>
-                        <option>Blinkit</option>
-                        <option>Other</option>
-                      </select>
+                      <input
+                        value={profile.platform || "Not provided"}
+                        readOnly
+                      />
                     </div>
 
+                    <div className="account-field full-field">
+                      <label>Member Since</label>
+                      <input value={profile.memberSince} readOnly />
+                    </div>
                   </div>
 
-                  {editing && (
-                    <button type="submit" className="save-account-btn">
-                      Save Changes
+                  <div className="profile-note">
+                    <span>ℹ️</span>
+                    Your account information is retrieved from your FINORA
+                    database profile.
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "settings" && (
+                <div className="settings-section">
+                  <div className="section-heading">
+                    <div>
+                      <h2>Account Settings</h2>
+                      <p>Manage your account access and security.</p>
+                    </div>
+                  </div>
+
+                  <div className="settings-card security-card">
+                    <h3>🛡️ Account Security</h3>
+                    <p>
+                      Your account uses authenticated login. Your financial
+                      information is associated with your registered account.
+                    </p>
+
+                    <div className="security-status">
+                      <span>Login authentication</span>
+                      <strong>Enabled</strong>
+                    </div>
+
+                    <div className="security-status">
+                      <span>Account email</span>
+                      <strong>{profile.email || "Not available"}</strong>
+                    </div>
+                  </div>
+
+                  <div className="settings-card logout-card">
+                    <div>
+                      <h3>Sign Out</h3>
+                      <p>
+                        Securely end your current FINORA session.
+                      </p>
+                    </div>
+
+                    <button
+                      className="logout-account-btn"
+                      onClick={logout}
+                    >
+                      Log Out
                     </button>
-                  )}
-
-                </form>
-
-                <div className="profile-note">
-                  <span>ℹ️</span>
-                  Your profile information helps FINORA personalise your
-                  financial insights.
-                </div>
-
-              </div>
-            )}
-
-            {activeTab === "settings" && (
-              <div className="settings-section">
-
-                <div className="section-heading">
-                  <div>
-                    <h2>Account Settings</h2>
-                    <p>Control your security and preferences.</p>
                   </div>
                 </div>
-
-                <div className="settings-card">
-                  <h3>🔔 Notification Preferences</h3>
-                  <p>Choose which notifications you want to receive.</p>
-
-                  {[
-                    ["emailNotifications", "Email Notifications", "Receive account-related updates."],
-                    ["incomeAlerts", "Income Instability Alerts", "Get notified when your earnings decrease."],
-                    ["expenseAlerts", "Expense Shortfall Alerts", "Get warnings about upcoming expense shortages."],
-                    ["fundReminders", "Protection Fund Reminders", "Receive reminders about your savings goals."],
-                  ].map(([key, title, description]) => (
-                    <div className="setting-row" key={key}>
-                      <div>
-                        <h4>{title}</h4>
-                        <p>{description}</p>
-                      </div>
-
-                      <label className="toggle-switch">
-                        <input
-                          type="checkbox"
-                          checked={settings[key]}
-                          onChange={() => toggleSetting(key)}
-                        />
-                        <span className="toggle-slider"></span>
-                      </label>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="settings-card password-card">
-                  <h3>🔐 Change Password</h3>
-                  <p>Keep your account secure with a strong password.</p>
-
-                  <form onSubmit={updatePassword}>
-                    <div className="account-field">
-                      <label>Current Password</label>
-                      <input
-                        type="password"
-                        name="current"
-                        value={passwords.current}
-                        onChange={handlePasswordChange}
-                        placeholder="Enter current password"
-                      />
-                    </div>
-
-                    <div className="account-field">
-                      <label>New Password</label>
-                      <input
-                        type="password"
-                        name="new"
-                        value={passwords.new}
-                        onChange={handlePasswordChange}
-                        placeholder="Minimum 8 characters"
-                      />
-                    </div>
-
-                    <div className="account-field">
-                      <label>Confirm New Password</label>
-                      <input
-                        type="password"
-                        name="confirm"
-                        value={passwords.confirm}
-                        onChange={handlePasswordChange}
-                        placeholder="Re-enter new password"
-                      />
-                    </div>
-
-                    <button type="submit" className="save-account-btn">
-                      Update Password
-                    </button>
-                  </form>
-                </div>
-
-                <div className="settings-card security-card">
-                  <h3>🛡️ Privacy & Security</h3>
-                  <p>
-                    Your financial information should remain private.
-                    Never share your password or verification codes.
-                  </p>
-                  <div className="security-status">
-                    <span>Account security</span>
-                    <strong>Security settings available</strong>
-                  </div>
-                </div>
-
-                <div className="settings-card logout-card">
-                  <div>
-                    <h3>Sign Out</h3>
-                    <p>Return to the FINORA login page.</p>
-                  </div>
-                  <button
-                    className="logout-account-btn"
-                    onClick={() => navigate("/login")}
-                  >
-                    Log Out
-                  </button>
-                </div>
-
-              </div>
-            )}
-
-          </section>
-        </div>
-
+              )}
+            </section>
+          </div>
+        )}
       </main>
 
       <footer className="account-footer">
         © 2026 FINORA. Your Income. Your Stability.
       </footer>
-
     </div>
   );
 }

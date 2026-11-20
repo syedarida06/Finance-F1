@@ -1,28 +1,137 @@
 
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import "./IncomeTracker.css";
 
+const API_URL = "http://localhost:5000/api/features";
+
+function formatAmount(value) {
+  const amount = Number(value || 0);
+
+  return (Number.isFinite(amount) ? amount : 0).toLocaleString("en-IN", {
+    maximumFractionDigits: 2,
+  });
+}
+
+function formatDate(date) {
+  if (!date) return "-";
+
+  const datePart = String(date).split("T")[0];
+  const parts = datePart.split("-");
+
+  if (parts.length === 3) {
+    return new Date(
+      Number(parts[0]),
+      Number(parts[1]) - 1,
+      Number(parts[2])
+    ).toLocaleDateString("en-IN");
+  }
+
+  const parsed = new Date(date);
+  return Number.isNaN(parsed.getTime())
+    ? "-"
+    : parsed.toLocaleDateString("en-IN");
+}
+
+function normalizeRecord(record) {
+  const delivery = Number(record.delivery_earnings || 0);
+  const incentives = Number(record.incentives || 0);
+
+  const expenses =
+    Number(record.fuel || 0) +
+    Number(record.maintenance || 0) +
+    Number(record.parking || 0) +
+    Number(record.mobile_data || 0) +
+    Number(record.other_expenses || 0);
+
+  return {
+    id: record.id,
+    date: formatDate(record.record_date),
+    earnings: delivery + incentives,
+    expenses,
+    net: delivery + incentives - expenses,
+  };
+}
+
 function IncomeTracker() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
   const [earnings, setEarnings] = useState("");
   const [incentives, setIncentives] = useState("");
   const [fuel, setFuel] = useState("");
   const [maintenance, setMaintenance] = useState("");
   const [parking, setParking] = useState("");
+  const [mobileData, setMobileData] = useState("");
   const [other, setOther] = useState("");
 
   const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  // Read the selected section from the dashboard URL
-  const [searchParams] = useSearchParams();
-
-  // References for direct navigation to form sections
   const earningsSectionRef = useRef(null);
   const expensesSectionRef = useRef(null);
   const earningsInputRef = useRef(null);
   const fuelInputRef = useRef(null);
 
-  // Automatically scroll to the requested section
+  // Fetch real income records belonging to the logged-in user
+  const fetchRecords = async () => {
+    const token = localStorage.getItem("finoraToken");
+
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    const response = await fetch(`${API_URL}/income`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (response.status === 401) {
+      localStorage.removeItem("finoraToken");
+      localStorage.removeItem("finoraUser");
+      navigate("/login", { replace: true });
+      throw new Error("Your session expired. Please sign in again.");
+    }
+
+    if (!response.ok) {
+      throw new Error(data.message || "Unable to load income records.");
+    }
+
+    const savedRecords = Array.isArray(data)
+      ? data
+      : data.records || data.income || data.data || [];
+
+    if (!Array.isArray(savedRecords)) {
+      throw new Error("Invalid income records received from the server.");
+    }
+
+    setRecords(savedRecords.map(normalizeRecord));
+  };
+
+  // Load records when the page opens
+  useEffect(() => {
+    const loadRecords = async () => {
+      try {
+        await fetchRecords();
+      } catch (err) {
+        setError(err.message || "Could not load income records.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRecords();
+  }, [navigate]);
+
+  // Dashboard quick-action navigation
   useEffect(() => {
     const tab = searchParams.get("tab");
 
@@ -45,7 +154,7 @@ function IncomeTracker() {
     }
   }, [searchParams]);
 
-  // Calculate current form values
+  // Live calculation using the current form entries
   const totalEarnings =
     Number(earnings || 0) + Number(incentives || 0);
 
@@ -53,11 +162,12 @@ function IncomeTracker() {
     Number(fuel || 0) +
     Number(maintenance || 0) +
     Number(parking || 0) +
+    Number(mobileData || 0) +
     Number(other || 0);
 
   const netIncome = totalEarnings - totalExpenses;
 
-  // Calculate recorded totals
+  // Totals calculated from actual database records
   const totalRecordedEarnings = records.reduce(
     (sum, record) => sum + record.earnings,
     0
@@ -71,53 +181,112 @@ function IncomeTracker() {
   const totalRecordedNetIncome =
     totalRecordedEarnings - totalRecordedExpenses;
 
-  // Save daily income record
-  const handleSubmit = (e) => {
+  // Save a new daily income record
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      earnings === "" ||
-      Number(earnings) < 0 ||
-      Number(incentives || 0) < 0 ||
-      Number(fuel || 0) < 0 ||
-      Number(maintenance || 0) < 0 ||
-      Number(parking || 0) < 0 ||
-      Number(other || 0) < 0
-    ) {
-      alert("Please enter valid amounts.");
+    const values = [
+      earnings,
+      incentives,
+      fuel,
+      maintenance,
+      parking,
+      mobileData,
+      other,
+    ];
+
+    const hasInvalidAmount = values.some(
+      (value) =>
+        value !== "" &&
+        (!Number.isFinite(Number(value)) || Number(value) < 0)
+    );
+
+    if (earnings.trim() === "" || hasInvalidAmount) {
+      setError("Enter valid non-negative amounts. Delivery earnings are required.");
       return;
     }
 
-    if (totalExpenses > totalEarnings) {
-      alert("Your expenses cannot exceed your total earnings.");
+    const token = localStorage.getItem("finoraToken");
+
+    if (!token) {
+      navigate("/login", { replace: true });
       return;
     }
 
-    const newRecord = {
-      id: Date.now(),
-      date: new Date().toLocaleDateString("en-IN"),
-      earnings: totalEarnings,
-      expenses: totalExpenses,
-      net: netIncome,
-    };
+    setSaving(true);
+    setError("");
+    setSuccess("");
 
-    setRecords((prev) => [newRecord, ...prev]);
+    try {
+      const today = new Date();
 
-    // Clear the form after saving
-    setEarnings("");
-    setIncentives("");
-    setFuel("");
-    setMaintenance("");
-    setParking("");
-    setOther("");
+      const localDate = [
+        today.getFullYear(),
+        String(today.getMonth() + 1).padStart(2, "0"),
+        String(today.getDate()).padStart(2, "0"),
+      ].join("-");
 
-    alert("Daily income saved successfully!");
+      const payload = {
+        record_date: localDate,
+        delivery_earnings: Number(earnings),
+        incentives: Number(incentives || 0),
+        fuel: Number(fuel || 0),
+        maintenance: Number(maintenance || 0),
+        parking: Number(parking || 0),
+        mobile_data: Number(mobileData || 0),
+        other_expenses: Number(other || 0),
+      };
+
+      const response = await fetch(`${API_URL}/income`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (response.status === 401) {
+        localStorage.removeItem("finoraToken");
+        localStorage.removeItem("finoraUser");
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to save income.");
+      }
+
+      // Clear the form after the backend confirms the save
+      setEarnings("");
+      setIncentives("");
+      setFuel("");
+      setMaintenance("");
+      setParking("");
+      setMobileData("");
+      setOther("");
+
+      setSuccess("Daily income saved successfully!");
+
+      // Refresh the actual database records
+      try {
+        await fetchRecords();
+      } catch (refreshError) {
+        setError(
+          "Your income was saved, but the history could not be refreshed. Reload the page to see it."
+        );
+      }
+    } catch (err) {
+      setError(err.message || "Something went wrong while saving.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <div className="income-page">
-
-      {/* NAVBAR */}
       <nav className="income-navbar">
         <Link to="/user-dashboard" className="income-logo">
           FINORA
@@ -129,8 +298,6 @@ function IncomeTracker() {
       </nav>
 
       <main className="income-container">
-
-        {/* PAGE HEADING */}
         <section className="income-heading">
           <span className="income-tag">FEATURE 01</span>
 
@@ -142,43 +309,32 @@ function IncomeTracker() {
           </p>
         </section>
 
-        {/* SUMMARY CARDS */}
+        {/* Actual saved totals from PostgreSQL */}
         <section className="income-summary">
-
           <div className="income-summary-card">
-            <p>Total Earnings</p>
-            <h2>
-              ₹{totalRecordedEarnings.toLocaleString("en-IN")}
-            </h2>
+            <p>Total Recorded Earnings</p>
+            <h2>₹{formatAmount(totalRecordedEarnings)}</h2>
           </div>
 
           <div className="income-summary-card">
-            <p>Total Expenses</p>
-            <h2>
-              ₹{totalRecordedExpenses.toLocaleString("en-IN")}
-            </h2>
+            <p>Total Recorded Expenses</p>
+            <h2>₹{formatAmount(totalRecordedExpenses)}</h2>
           </div>
 
           <div className="income-summary-card net-card">
-            <p>Net Income</p>
-            <h2>
-              ₹{totalRecordedNetIncome.toLocaleString("en-IN")}
-            </h2>
+            <p>Total Recorded Net Income</p>
+            <h2>₹{formatAmount(totalRecordedNetIncome)}</h2>
           </div>
-
         </section>
 
-        {/* INCOME ENTRY FORM */}
+        {/* Daily income form */}
         <section className="income-form-section">
-
           <div className="section-title">
             <h2>Enter Your Daily Income</h2>
             <p>Add your earnings and expenses for today.</p>
           </div>
 
           <form onSubmit={handleSubmit}>
-
-            {/* DAILY EARNINGS */}
             <div
               className="form-subheading"
               ref={earningsSectionRef}
@@ -188,14 +344,13 @@ function IncomeTracker() {
             </div>
 
             <div className="income-input-grid">
-
               <div className="income-field">
                 <label>Delivery Earnings (₹) *</label>
-
                 <input
                   ref={earningsInputRef}
                   type="number"
                   min="0"
+                  step="0.01"
                   value={earnings}
                   onChange={(e) => setEarnings(e.target.value)}
                   placeholder="Enter delivery earnings"
@@ -205,19 +360,17 @@ function IncomeTracker() {
 
               <div className="income-field">
                 <label>Incentives / Bonuses (₹)</label>
-
                 <input
                   type="number"
                   min="0"
+                  step="0.01"
                   value={incentives}
                   onChange={(e) => setIncentives(e.target.value)}
                   placeholder="Enter incentives"
                 />
               </div>
-
             </div>
 
-            {/* WORK-RELATED EXPENSES */}
             <div
               className="form-subheading expense-subheading"
               ref={expensesSectionRef}
@@ -227,14 +380,13 @@ function IncomeTracker() {
             </div>
 
             <div className="income-input-grid">
-
               <div className="income-field">
                 <label>Fuel Expenses (₹)</label>
-
                 <input
                   ref={fuelInputRef}
                   type="number"
                   min="0"
+                  step="0.01"
                   value={fuel}
                   onChange={(e) => setFuel(e.target.value)}
                   placeholder="Fuel cost"
@@ -243,10 +395,10 @@ function IncomeTracker() {
 
               <div className="income-field">
                 <label>Vehicle Maintenance (₹)</label>
-
                 <input
                   type="number"
                   min="0"
+                  step="0.01"
                   value={maintenance}
                   onChange={(e) => setMaintenance(e.target.value)}
                   placeholder="Maintenance cost"
@@ -255,10 +407,10 @@ function IncomeTracker() {
 
               <div className="income-field">
                 <label>Parking Expenses (₹)</label>
-
                 <input
                   type="number"
                   min="0"
+                  step="0.01"
                   value={parking}
                   onChange={(e) => setParking(e.target.value)}
                   placeholder="Parking cost"
@@ -266,74 +418,89 @@ function IncomeTracker() {
               </div>
 
               <div className="income-field">
-                <label>Other Expenses (₹)</label>
-
+                <label>Mobile Data Expenses (₹)</label>
                 <input
                   type="number"
                   min="0"
+                  step="0.01"
+                  value={mobileData}
+                  onChange={(e) => setMobileData(e.target.value)}
+                  placeholder="Mobile data cost"
+                />
+              </div>
+
+              <div className="income-field">
+                <label>Other Expenses (₹)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
                   value={other}
                   onChange={(e) => setOther(e.target.value)}
                   placeholder="Other work expenses"
                 />
               </div>
-
             </div>
 
-            {/* LIVE CALCULATION */}
+            {/* Live calculation from current form entries */}
             <div className="income-calculation">
-
               <h3>Income Calculation</h3>
 
               <div className="calculation-row">
                 <span>Total Earnings</span>
-
-                <strong>
-                  ₹{totalEarnings.toLocaleString("en-IN")}
-                </strong>
+                <strong>₹{formatAmount(totalEarnings)}</strong>
               </div>
 
               <div className="calculation-row">
                 <span>Total Work Expenses</span>
-
-                <strong>
-                  − ₹{totalExpenses.toLocaleString("en-IN")}
-                </strong>
+                <strong>− ₹{formatAmount(totalExpenses)}</strong>
               </div>
 
               <div className="calculation-divider"></div>
 
               <div className="calculation-total">
                 <span>Actual Take-Home Income</span>
-
-                <strong>
-                  ₹{netIncome.toLocaleString("en-IN")}
-                </strong>
+                <strong>₹{formatAmount(netIncome)}</strong>
               </div>
-
             </div>
 
-            {/* SAVE BUTTON */}
-            <button type="submit" className="save-income-btn">
-              Save Daily Income
+            <button
+              type="submit"
+              className="save-income-btn"
+              disabled={saving}
+            >
+              {saving ? "Saving..." : "Save Daily Income"}
             </button>
-
           </form>
         </section>
 
-        {/* INCOME HISTORY */}
-        <section className="income-history">
+        {error && (
+          <p role="alert" style={{ color: "red", marginTop: "15px" }}>
+            {error}
+          </p>
+        )}
 
+        {success && (
+          <p role="status" style={{ marginTop: "15px" }}>
+            {success}
+          </p>
+        )}
+
+        {/* Database-backed income history */}
+        <section className="income-history">
           <div className="section-title">
             <h2>Income History</h2>
             <p>Your previously recorded daily earnings.</p>
           </div>
 
-          {records.length === 0 ? (
+          {loading ? (
+            <div className="empty-income">
+              <p>Loading your income records...</p>
+            </div>
+          ) : records.length === 0 ? (
             <div className="empty-income">
               <span>📊</span>
-
               <h3>No Income Records Yet</h3>
-
               <p>
                 Enter your daily earnings above to start tracking
                 your actual take-home income.
@@ -341,7 +508,6 @@ function IncomeTracker() {
             </div>
           ) : (
             <div className="income-table-wrapper">
-
               <table className="income-table">
                 <thead>
                   <tr>
@@ -353,38 +519,26 @@ function IncomeTracker() {
                 </thead>
 
                 <tbody>
-                  {records.map((record) => (
-                    <tr key={record.id}>
+                  {records.map((record, index) => (
+                    <tr key={record.id || `${record.date}-${index}`}>
                       <td>{record.date}</td>
-
-                      <td>
-                        ₹{record.earnings.toLocaleString("en-IN")}
-                      </td>
-
-                      <td>
-                        ₹{record.expenses.toLocaleString("en-IN")}
-                      </td>
-
-                      <td className="positive-income">
-                        ₹{record.net.toLocaleString("en-IN")}
+                      <td>₹{formatAmount(record.earnings)}</td>
+                      <td>₹{formatAmount(record.expenses)}</td>
+                      <td className={record.net >= 0 ? "positive-income" : ""}>
+                        ₹{formatAmount(record.net)}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-
             </div>
           )}
-
         </section>
-
       </main>
 
-      {/* FOOTER */}
       <footer className="income-footer">
         FINORA © 2026 | Your Income. Your Stability.
       </footer>
-
     </div>
   );
 }

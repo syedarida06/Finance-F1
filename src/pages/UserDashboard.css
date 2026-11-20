@@ -1168,3 +1168,485 @@
   outline: 3px solid #42C8AD;
   outline-offset: 3px;
 }
+
+
+
+/* =========================================
+   FINORA - SAGE & BEIGE PROFESSIONAL THEME
+========================================= */
+
+.user-dashboard {
+  background: #F3EFE5;
+  color: #263F36;
+}
+
+/* NAVBAR */
+
+.user-navbar {
+  background: #263F36;
+  box-shadow: 0 4px 20px rgba(38, 63, 54, 0.13);
+}
+
+.user-logo {
+  color: #F8F6EF;
+}
+
+.user-logo span,
+.footer-logo span {
+  color: #B8C9AE;
+}
+
+.dashboard-nav-link {
+  color: #E1E8DC;
+}
+
+.dashboard-nav-link:hover {
+  color: #B8C9AE;
+}
+
+.nav-icon-button,
+.profile-trigger {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.18);
+}
+
+.nav-icon-button:hover,
+.profile-trigger:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+.user-avatar {
+  background: #829B83;
+  color: #FFFFFF;
+}
+
+.dropdown-arrow {
+  color: #C4D1C0;
+}
+
+.notification-dot {
+  background: #D9B982;
+  border-color: #263F36;
+}
+
+/* DROPDOWNS */
+
+.nav-dropdown {
+  background: #FFFEFA;
+  color: #263F36;
+  border-color: #E4DDCF;
+  box-shadow: 0 15px 40px rgba(38, 63, 54, 0.15);
+}
+
+.nav-dropdown h3 {
+  color: #263F36;
+}
+
+.profile-dropdown-header p,
+.dropdown-notification p {
+  color: #7D8980;
+}
+
+.dropdown-divider {
+  background: #EAE5DA;
+}
+
+.dropdown-link {
+  color: #53695B;
+}
+
+.dropdown-link:hover {
+  background: #EEF1E9;
+  color: #405F48;
+}
+
+.logout-link {
+  color: #A45D52;
+}
+
+/* MAIN BACKGROUND */
+
+.user-main {
+  color: #263F36;
+}
+
+/* WELCOME SECTION */
+
+.user-welcome {
+  background: linear-gradient(
+    115deg,
+    #263F36 0%,
+    #405F4B 58%,
+    #718C73 100%
+  );
+  box-shadow: 0 12px 30px rgba(38, 63, 54, 0.12);
+}
+
+.user-welcome::after {
+  border-color: rgba(255,255,255,0.12);
+}
+
+.welcome-label {
+  color: #D4E2C9;
+}
+
+.welcome-label-dot {
+  background: #C5D8B8;
+  box-shadow: 0 0 10px rgba(197,216,184,0.6);
+}
+
+.user-welcome h1 {
+  color: #FFFFFF;
+}
+
+.user-welcome h1 span {
+  color: #D1DFC1;
+}
+
+.user-welcome > div > p {
+  color: #E0E8DD;
+}
+
+.welcome-primary-button {
+  background: #D4DFC8;
+  color: #263F36;
+}
+
+.welcome-primary-button:hover {
+  background: #E6EBDD;
+}
+
+.welcome-secondary-button {
+  color: #FFFFFF;
+  border-color: rgba(255,255,255,0.4);
+}
+
+/* SECTION HEADINGS */
+
+.section-eyebrow {
+  color: #718C73;
+}
+
+.section-heading h2,
+.feature-heading h2,
+.panel-heading h2 {
+  color: #263F36;
+}
+
+.section-heading p,
+.feature-heading p,
+.panel-heading p {
+  color: #7C8980;
+}
+
+.sample-period {
+  background: #E7E1D4;
+  color: #647568;
+}
+
+/* SUMMARY CARDS */
+
+.summary-card {
+  background: #FFFEFA;
+  border-color: #E7E0D4;
+  box-shadow: 0 4px 15px rgba(38, 63, 54, 0.045);
+}
+
+.summary-card:hover {
+  box-shadow: 0 10px 25px rgba(38, 63, 54, 0.10);
+}
+
+.summary-icon {
+  background: #EAF0E5;
+  color: #58745D;
+}
+
+.summary-tag {
+  color: #8D9A8E;
+}
+
+.summary-card > p {
+  color: #687A6D;
+}
+
+.summary-card h2 {
+  color: #405F48;
+}
+
+.summary-description {
+  color: #929D91;
+}
+
+.expenses-card .summary-icon {
+  background: #F4EBDD;
+  color: #A77A4C;
+}
+
+.net-card .summary-icon {
+  background: #E8EDE6;
+  color: #58745D;
+}
+
+.fund-card .summary-icon {
+  background: #EEEAE0;
+  color: #87775C;
+}
+
+/* DASHBOARD PANELS */
+
+.dashboard-main-grid {
+  color: #263F36;
+}
+
+.dashboard-panel {
+  background: #FFFEFA;
+  border-color: #E7E0D4;
+  box-shadow: 0 4px 15px rgba(38, 63, 54, 0.045);
+}
+
+.panel-icon {
+  background: #EAF0E5;
+  color: #58745D;
+}
+
+/* PROTECTION FUND */
+
+.fund-amount h3 {
+  color: #405F48;
+}
+
+.fund-amount span {
+  color: #7C8980;
+}
+
+.fund-progress-details {
+  color: #718075;
+}
+
+.fund-progress-details strong {
+  color: #58745D;
+}
+
+.fund-progress-track {
+  background: #E8E6DB;
+}
+
+.fund-progress-fill {
+  background: linear-gradient(
+    90deg,
+    #718C73,
+    #AFC0AA
+  );
+}
+
+.fund-target-details {
+  color: #8C988D;
+}
+
+.fund-widget-note {
+  color: #718075;
+}
+
+.panel-action {
+  color: #58745D;
+  border-color: #AFC0AA;
+}
+
+.panel-action:hover {
+  color: #263F36;
+}
+
+/* FINANCIAL ALERTS */
+
+.alert-item {
+  border: 1px solid transparent;
+}
+
+.alert-item strong {
+  color: #405449;
+}
+
+.alert-item p {
+  color: #748177;
+}
+
+.alert-info {
+  background: #EEF0EA;
+  border-color: #E0E6D9;
+}
+
+.alert-warning {
+  background: #F6EFE3;
+  border-color: #EDE1CD;
+}
+
+.alert-success {
+  background: #EAF1E7;
+  border-color: #DCE7D8;
+}
+
+.alert-disclaimer {
+  color: #8F9A90;
+}
+
+/* FEATURE CARDS */
+
+.user-feature-card {
+  background: #FFFEFA;
+  border-color: #E7E0D4;
+  color: #263F36;
+  box-shadow: 0 4px 15px rgba(38, 63, 54, 0.045);
+}
+
+.user-feature-card::before {
+  background: #829B83;
+}
+
+.user-feature-card:hover {
+  border-color: #AFC0AA;
+  box-shadow: 0 12px 28px rgba(38, 63, 54, 0.10);
+}
+
+.feature-icon {
+  background: #EAF0E5;
+  color: #58745D;
+}
+
+.feature-number {
+  color: #89998B;
+}
+
+.user-feature-card h3 {
+  color: #30483A;
+}
+
+.user-feature-card > p {
+  color: #748177;
+}
+
+.feature-card-bottom {
+  color: #58745D;
+}
+
+.feature-arrow {
+  background: #EAF0E5;
+  color: #58745D;
+}
+
+.user-feature-card:hover .feature-arrow {
+  background: #58745D;
+  color: #FFFFFF;
+}
+
+/* RECENT ACTIVITY */
+
+.activity-row {
+  border-color: #ECE8DE;
+}
+
+.activity-icon {
+  background: #EAF0E5;
+  color: #58745D;
+}
+
+.activity-details strong {
+  color: #405449;
+}
+
+.activity-details span,
+.activity-amount-section span {
+  color: #8C988D;
+}
+
+.positive {
+  color: #527C5A;
+}
+
+.negative {
+  color: #A86C54;
+}
+
+.activity-disclaimer {
+  color: #8F9A90;
+}
+
+/* FINORA INSIGHT */
+
+.finora-insight {
+  background: linear-gradient(
+    110deg,
+    #E8EDE3,
+    #F0EEE4
+  );
+  border-color: #DCE4D6;
+  border-left-color: #718C73;
+}
+
+.insight-icon {
+  background: #D9E3D2;
+  color: #405F48;
+}
+
+.finora-insight h3 {
+  color: #405F48;
+}
+
+.finora-insight p {
+  color: #617366;
+}
+
+/* FOOTER */
+
+.user-footer {
+  background: #263F36;
+  color: #D5DED3;
+}
+
+.footer-logo {
+  color: #FFFFFF;
+}
+
+.user-footer p {
+  color: #E1E8DC;
+}
+
+.user-footer > span {
+  color: #B0C0B0;
+}
+
+/* ACCESSIBILITY */
+
+.user-dashboard button:focus-visible,
+.user-dashboard a:focus-visible {
+  outline: 3px solid #AFC0AA;
+  outline-offset: 3px;
+}
+
+/* SUBTLE INTERACTION */
+
+.summary-card,
+.dashboard-panel,
+.user-feature-card {
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+/* MOBILE BACKGROUND */
+
+@media (max-width: 650px) {
+  .user-welcome {
+    background: linear-gradient(
+      135deg,
+      #263F36,
+      #58745D
+    );
+  }
+
+  .summary-card,
+  .dashboard-panel,
+  .user-feature-card {
+    border-radius: 13px;
+  }
+}

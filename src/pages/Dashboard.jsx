@@ -6,22 +6,32 @@ import "./Dashboard.css";
 function Dashboard() {
   const navigate = useNavigate();
 
-  const weeklyEarnings = [
-    { day: "Mon", amount: 650 },
-    { day: "Tue", amount: 850 },
-    { day: "Wed", amount: 720 },
-    { day: "Thu", amount: 950 },
-    { day: "Fri", amount: 780 },
-    { day: "Sat", amount: 1100 },
-    { day: "Sun", amount: 900 },
+  const features = [
+    {
+      title: "True Take-Home Income Tracker",
+      description: "Track delivery earnings, incentives and work expenses to calculate your actual income."
+    },
+    {
+      title: "Income Instability Alert",
+      description: "Identify sudden drops in earnings and understand changes in your income."
+    },
+    {
+      title: "Essential Expense Shortfall Alert",
+      description: "Check whether your available money can cover upcoming essential expenses."
+    },
+    {
+      title: "Workday Loss & Emergency Protection",
+      description: "Estimate lost income when unexpected events interrupt your work."
+    },
+    {
+      title: "Smart Lean-Month Protection Fund",
+      description: "Plan flexible savings during better earning periods to prepare for low-income days."
+    }
   ];
-
-  const maxEarning = 1100;
 
   return (
     <div className="finora">
 
-      {/* NAVBAR */}
       <nav className="finora-navbar">
         <a href="#home" className="finora-logo">
           FINORA<span>.</span>
@@ -34,14 +44,17 @@ function Dashboard() {
         </div>
 
         <div className="nav-actions">
-          <a href="/login" className="login-link">Sign In</a>
-          <a href="/signup" className="signup-link">Sign Up</a>
+          <button className="login-link" onClick={() => navigate("/login")}>
+            Sign In
+          </button>
+          <button className="signup-link" onClick={() => navigate("/signup")}>
+            Sign Up
+          </button>
         </div>
       </nav>
 
       <main className="finora-main" id="home">
 
-        {/* WELCOME */}
         <section className="welcome-section">
           <div>
             <span className="eyebrow">YOUR FINANCIAL SPACE</span>
@@ -53,194 +66,142 @@ function Dashboard() {
               Take control of your earnings, manage everyday work
               expenses and build a stronger financial future with FINORA.
             </p>
+
+            <button
+              className="signup-link"
+              onClick={() => navigate("/signup")}
+            >
+              Get Started
+            </button>
           </div>
 
           <div className="overview-label">
-            <span>FINANCIAL OVERVIEW</span>
-            <strong>Weekly Dashboard</strong>
+            <span>FINANCIAL STABILITY PLATFORM</span>
+            <strong>Built for Delivery Partners</strong>
           </div>
         </section>
 
-        {/* STAT CARDS */}
         <section className="stats-grid">
 
           <div className="stat-card">
             <div className="stat-heading">
-              <span>Total Earnings</span>
+              <span>Income Tracking</span>
               <span className="stat-icon">↗</span>
             </div>
-            <h2>₹5,950</h2>
-            <p>This week</p>
+            <h2>Track</h2>
+            <p>Understand your actual take-home income</p>
           </div>
 
           <div className="stat-card">
             <div className="stat-heading">
-              <span>Work Expenses</span>
-              <span className="stat-icon">−</span>
+              <span>Early Alerts</span>
+              <span className="stat-icon">!</span>
             </div>
-            <h2>₹1,250</h2>
-            <p>This week</p>
+            <h2>Prepare</h2>
+            <p>Identify possible financial difficulties</p>
           </div>
 
           <div className="stat-card">
             <div className="stat-heading">
-              <span>Net Income</span>
+              <span>Expense Planning</span>
               <span className="stat-icon">₹</span>
             </div>
-            <h2>₹4,700</h2>
-            <p>After work expenses</p>
+            <h2>Manage</h2>
+            <p>Plan essential expenses with confidence</p>
           </div>
 
           <div className="stat-card reserve-stat">
             <div className="stat-heading">
-              <span>Emergency Reserve</span>
+              <span>Emergency Savings</span>
               <span className="stat-icon">◇</span>
             </div>
-            <h2>₹8,000</h2>
-            <p>Your safety savings</p>
+            <h2>Protect</h2>
+            <p>Prepare for unexpected low-income periods</p>
           </div>
 
         </section>
 
-        {/* EARNINGS CHART + SAFETY */}
-        <section className="dashboard-grid">
+        <section className="dashboard-grid" id="features">
 
           <div className="panel earnings-panel">
             <div className="panel-header">
               <div>
-                <h3>Weekly Earnings</h3>
-                <p>Track your income throughout the week</p>
+                <h3>How FINORA Works</h3>
+                <p>A practical approach to managing irregular income</p>
               </div>
-              <span className="period-tag">This week</span>
             </div>
 
-            <div className="earnings-chart">
-              {weeklyEarnings.map((item) => (
-                <div className="chart-column" key={item.day}>
-                  <span className="chart-value">₹{item.amount}</span>
-
-                  <div className="bar-area">
-                    <div
-                      className="chart-bar"
-                      style={{
-                        height: `${(item.amount / maxEarning) * 100}%`,
-                      }}
-                    />
-                  </div>
-
-                  <span className="chart-day">{item.day}</span>
-                </div>
-              ))}
+            <div className="quick-actions">
+              <div>Track your earnings and work expenses</div>
+              <div>Identify income fluctuations</div>
+              <div>Plan upcoming essential expenses</div>
+              <div>Build a flexible protection fund</div>
             </div>
           </div>
 
           <div className="panel safety-panel">
             <span className="eyebrow">YOUR SAFETY NET</span>
-            <h3>Emergency Reserve</h3>
+            <h3>Prepare for Lean Months</h3>
             <p className="panel-description">
-              Your current savings could cover approximately
+              Build financial resilience by planning savings
+              during higher-income periods.
             </p>
 
             <div className="safety-value">
-              <strong>8</strong>
-              <span>days</span>
-            </div>
-
-            <div className="progress-track">
-              <div className="progress-fill" />
+              <strong>Plan</strong>
             </div>
 
             <p className="safety-message">
-              Keep growing your reserve to prepare for unexpected
-              low-income days.
+              Your savings plan can help you manage essential
+              expenses when earnings decrease.
             </p>
           </div>
 
         </section>
 
-        {/* QUICK ACTIONS + ACTIVITY */}
         <section className="dashboard-grid bottom-grid">
 
           <div className="panel">
-            <h3>Quick Actions</h3>
+            <h3>Explore FINORA</h3>
             <p className="panel-description">
-              Manage your daily finances
+              Get started with your financial planning.
             </p>
 
             <div className="quick-actions">
-
-              <button
-                onClick={() => navigate("/income-tracker?tab=earnings")}
-              >
-                + Add Earnings
+              <button onClick={() => navigate("/signup")}>
+                Create Account
               </button>
 
-              <button
-                onClick={() => navigate("/income-tracker?tab=expenses")}
-              >
-                + Add Expense
+              <button onClick={() => navigate("/login")}>
+                Sign In
               </button>
-
-              <button
-                onClick={() => navigate("/protection-fund")}
-              >
-                View Savings
-              </button>
-
-              <button
-                onClick={() => navigate("/income-simulator")}
-              >
-                Income Simulator
-              </button>
-
             </div>
           </div>
 
           <div className="panel activity-panel">
-            <h3>Recent Activity</h3>
-
-            <div className="activity-row">
-              <div className="activity-info">
-                <strong>Delivery Earnings</strong>
-                <span>Today · 25 deliveries</span>
-              </div>
-              <strong className="income">+₹850</strong>
-            </div>
-
-            <div className="activity-row">
-              <div className="activity-info">
-                <strong>Fuel Expense</strong>
-                <span>Today · Work expense</span>
-              </div>
-              <strong className="expense">−₹180</strong>
-            </div>
-
-            <div className="activity-row">
-              <div className="activity-info">
-                <strong>Reserve Savings</strong>
-                <span>Yesterday · Savings</span>
-              </div>
-              <strong className="income">+₹300</strong>
-            </div>
+            <h3>Designed for Your Financial Reality</h3>
+            <p className="panel-description">
+              Unlike traditional budgeting tools that assume a fixed
+              salary, FINORA focuses on changing daily earnings and
+              the financial challenges faced by delivery partners.
+            </p>
           </div>
 
         </section>
 
-        {/* SMART INSIGHT */}
-        <section className="insight-section" id="features">
+        <section className="insight-section">
           <div className="insight-symbol">✦</div>
           <div>
             <span className="eyebrow">FINORA INSIGHT</span>
             <h3>Make your high-income days count.</h3>
             <p>
               Set aside a portion of your earnings on better days.
-              A small reserve today can help you manage unexpected
-              low-income days tomorrow.
+              A flexible reserve can help you manage unexpected
+              low-income days.
             </p>
           </div>
         </section>
 
-        {/* ABOUT */}
         <section className="about-section" id="about">
           <span className="eyebrow">ABOUT FINORA</span>
           <h2>Built for the reality of irregular income.</h2>
@@ -254,7 +215,6 @@ function Dashboard() {
 
       </main>
 
-      {/* FOOTER */}
       <footer className="finora-footer">
         <a href="#home" className="finora-logo">
           FINORA<span>.</span>
