@@ -2,20 +2,20 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --forest: #263F35;
-  --forest-dark: #1C332B;
-  --forest-light: #385849;
-  --sage: #91A58B;
-  --sage-light: #DCE5D7;
-  --sage-pale: #EAF0E5;
+  --forest: #625579;
+  --forest-dark: #514564;
+  --forest-light: #76678D;
+  --sage: #91A18F;
+  --sage-light: #E0E5DD;
+  --sage-pale: #EDF0E9;
   --beige: #D9C9AA;
-  --cream: #F4EFE4;
-  --ivory: #FAF8F2;
-  --gold: #B38B52;
-  --gold-light: #E9D9B9;
-  --text-dark: #293B32;
-  --text-muted: #7C877C;
-  --border: #E6E0D2;
+  --cream: #E6E0EF;
+  --ivory: #FBF9FD;
+  --gold: #B89562;
+  --gold-light: #E9D9BC;
+  --text-dark: #40394B;
+  --text-muted: #81798C;
+  --border: #D8D0E2;
   --white: #FFFFFF;
 }
 
@@ -53,7 +53,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 5px 20px rgba(28,51,43,0.12);
+  box-shadow: 0 5px 20px rgba(65,52,83,0.12);
 }
 
 .finora-logo {
@@ -66,7 +66,7 @@ body {
 }
 
 .finora-logo span {
-  color: #C7A46C;
+  color: #D7B982;
 }
 
 .nav-links {
@@ -78,7 +78,7 @@ body {
 .nav-links a,
 .login-link {
   text-decoration: none;
-  color: #D4DED2;
+  color: #E0D9E8;
   font-size: 14px;
   font-weight: 600;
   transition: 0.25s ease;
@@ -86,7 +86,7 @@ body {
 
 .nav-links a:hover,
 .login-link:hover {
-  color: #D9BD8E;
+  color: #E4C995;
 }
 
 .nav-actions {
@@ -104,11 +104,11 @@ body {
   font-size: 14px;
   font-weight: 700;
   transition: 0.25s ease;
-  box-shadow: 0 4px 12px rgba(179,139,82,0.2);
+  box-shadow: 0 4px 12px rgba(184,149,98,0.2);
 }
 
 .signup-link:hover {
-  background: #987344;
+  background: #A17F4F;
   transform: translateY(-2px);
 }
 
@@ -133,7 +133,7 @@ body {
 
 .eyebrow {
   display: inline-block;
-  color: #8B7147;
+  color: #91754F;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 1.8px;
@@ -150,29 +150,29 @@ body {
 }
 
 .welcome-section h1 span {
-  color: #7E977A;
+  color: #81729A;
 }
 
 .welcome-section p {
-  color: #737F73;
+  color: #777083;
   font-size: 15px;
   line-height: 1.9;
   max-width: 570px;
 }
 
 .overview-label {
-  background: linear-gradient(135deg, #E4E9DA, #F0E8D8);
-  border: 1px solid #D6D9C8;
+  background: linear-gradient(135deg, #F0EBF5, #F3EBDD);
+  border: 1px solid #DDD3E5;
   padding: 19px 24px;
   border-radius: 14px;
   min-width: 190px;
-  box-shadow: 0 7px 20px rgba(51,72,53,0.06);
+  box-shadow: 0 7px 20px rgba(65,52,83,0.06);
 }
 
 .overview-label span {
   display: block;
   font-size: 10px;
-  color: #77836C;
+  color: #81758F;
   font-weight: 800;
   letter-spacing: 1.2px;
   margin-bottom: 8px;
@@ -197,7 +197,7 @@ body {
   padding: 25px;
   border-radius: 15px;
   border: 1px solid var(--border);
-  box-shadow: 0 5px 18px rgba(50,64,45,0.045);
+  box-shadow: 0 5px 18px rgba(65,52,83,0.045);
   transition: 0.25s ease;
   position: relative;
   overflow: hidden;
@@ -211,21 +211,21 @@ body {
   border-radius: 50%;
   right: -25px;
   bottom: -32px;
-  background: rgba(145,165,139,0.12);
+  background: rgba(145,161,143,0.16);
 }
 
 .stat-card:hover,
 .panel:hover {
-  box-shadow: 0 12px 28px rgba(50,64,45,0.09);
+  box-shadow: 0 12px 28px rgba(65,52,83,0.10);
   transform: translateY(-3px);
-  border-color: #D5DCCB;
+  border-color: #C7BBD6;
 }
 
 .stat-heading {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #788276;
+  color: #777083;
   font-size: 13px;
   font-weight: 700;
   gap: 8px;
@@ -237,8 +237,8 @@ body {
   border-radius: 11px;
   display: grid;
   place-items: center;
-  background: var(--sage-light);
-  color: var(--forest);
+  background: #E4DFEC;
+  color: #625579;
   font-size: 18px;
   font-weight: 700;
 }
@@ -253,17 +253,17 @@ body {
 
 .stat-card > p {
   font-size: 12px;
-  color: #92978A;
+  color: #91899A;
 }
 
 .reserve-stat {
-  background: linear-gradient(140deg, #E1E9D9, #F0E6D2);
-  border-color: #D7DDC9;
+  background: linear-gradient(140deg, #E5E1ED, #F1E9D9);
+  border-color: #D8CEE0;
 }
 
 .reserve-stat .stat-icon {
-  background: #F3E4C8;
-  color: #967343;
+  background: #F1E4CB;
+  color: #98794D;
 }
 
 /* DASHBOARD PANELS */
@@ -280,7 +280,7 @@ body {
   padding: 27px;
   border-radius: 16px;
   border: 1px solid var(--border);
-  box-shadow: 0 5px 18px rgba(50,64,45,0.045);
+  box-shadow: 0 5px 18px rgba(65,52,83,0.045);
   transition: 0.25s ease;
 }
 
@@ -293,7 +293,7 @@ body {
 
 .panel-description,
 .panel-header p {
-  color: #879083;
+  color: #898193;
   font-size: 13px;
   line-height: 1.7;
 }
@@ -306,8 +306,8 @@ body {
 }
 
 .period-tag {
-  background: #E8EBDD;
-  color: #536C4F;
+  background: #E8E3EF;
+  color: #685A7D;
   padding: 8px 13px;
   border-radius: 8px;
   font-size: 11px;
@@ -338,7 +338,7 @@ body {
 
 .chart-value {
   font-size: 10px;
-  color: #827F6F;
+  color: #82798C;
   white-space: nowrap;
 }
 
@@ -348,28 +348,28 @@ body {
   height: 145px;
   display: flex;
   align-items: flex-end;
-  background: #E9EDE2;
+  background: #E9E5EF;
   border-radius: 9px 9px 4px 4px;
   overflow: hidden;
 }
 
 .chart-bar {
   width: 100%;
-  background: linear-gradient(180deg, #A8B99A, #536F58);
+  background: linear-gradient(180deg, #A99BBE, #74658D);
   border-radius: 9px 9px 4px 4px;
   transition: height 0.4s ease;
 }
 
 .chart-day {
   font-size: 11px;
-  color: #879082;
+  color: #898193;
 }
 
 /* FINANCIAL SAFETY */
 
 .safety-panel {
-  background: linear-gradient(145deg, #263F35, #354F40);
-  border-color: #263F35;
+  background: linear-gradient(145deg, #625579, #75678A);
+  border-color: #625579;
   color: white;
   position: relative;
   overflow: hidden;
@@ -381,22 +381,22 @@ body {
   width: 190px;
   height: 190px;
   border-radius: 50%;
-  border: 1px solid rgba(229,214,180,0.13);
+  border: 1px solid rgba(229,214,180,0.18);
   right: -75px;
   top: -85px;
 }
 
 .safety-panel .eyebrow {
-  color: #D7B77F;
+  color: #E2C995;
 }
 
 .safety-panel h3 {
-  color: #FBF8EF;
+  color: #FBF8FF;
   font-size: 21px;
 }
 
 .safety-panel .panel-description {
-  color: #C5D0BF;
+  color: #E0D9E9;
   margin-top: 15px;
 }
 
@@ -410,17 +410,17 @@ body {
 .safety-value strong {
   font-family: 'Manrope', sans-serif;
   font-size: 55px;
-  color: #DCC69B;
+  color: #E8D2A9;
 }
 
 .safety-value span {
   font-size: 16px;
-  color: #D2DBCC;
+  color: #E4DDEB;
 }
 
 .progress-track {
   height: 9px;
-  background: #506557;
+  background: #8C819D;
   border-radius: 20px;
   overflow: hidden;
 }
@@ -428,13 +428,13 @@ body {
 .progress-fill {
   height: 100%;
   width: 65%;
-  background: linear-gradient(90deg, #D9C39A, #B5C59D);
+  background: linear-gradient(90deg, #E4C994, #C5D1B9);
   border-radius: 20px;
 }
 
 .safety-message {
   margin-top: 18px;
-  color: #CBD6C8;
+  color: #E0D9E8;
   font-size: 12px;
   line-height: 1.8;
 }
@@ -449,9 +449,9 @@ body {
 }
 
 .quick-actions button {
-  background: #E6EBDD;
-  border: 1px solid #D5DFCE;
-  color: #405B45;
+  background: #E9E5EF;
+  border: 1px solid #D9D0E3;
+  color: #625579;
   border-radius: 9px;
   padding: 13px 10px;
   font-family: inherit;
@@ -462,8 +462,8 @@ body {
 }
 
 .quick-actions button:hover {
-  background: #D5E0CE;
-  border-color: #AABCA2;
+  background: #DDD5E8;
+  border-color: #BEB0D0;
   transform: translateY(-2px);
 }
 
@@ -479,7 +479,7 @@ body {
   justify-content: space-between;
   gap: 10px;
   padding: 16px 0;
-  border-bottom: 1px solid #EBE8DD;
+  border-bottom: 1px solid #EBE6F0;
 }
 
 .activity-row:last-child {
@@ -488,25 +488,25 @@ body {
 
 .activity-info strong {
   display: block;
-  color: #405247;
+  color: #51475F;
   font-size: 13px;
   margin-bottom: 5px;
 }
 
 .activity-info span {
   display: block;
-  color: #969A8D;
+  color: #9790A0;
   font-size: 11px;
 }
 
 .income {
-  color: #577B59;
+  color: #638267;
   font-size: 13px;
   font-weight: 700;
 }
 
 .expense {
-  color: #B4775E;
+  color: #B47770;
   font-size: 13px;
   font-weight: 700;
 }
@@ -520,9 +520,9 @@ body {
   padding: 29px;
   margin-top: 27px;
   border-radius: 15px;
-  background: linear-gradient(120deg, #E4E9D9, #F1E7D6);
-  border: 1px solid #DCDDCB;
-  box-shadow: 0 5px 17px rgba(50,64,45,0.035);
+  background: linear-gradient(120deg, #E7E3EF, #F2EBDD);
+  border: 1px solid #DCD3E4;
+  box-shadow: 0 5px 17px rgba(65,52,83,0.035);
 }
 
 .insight-symbol {
@@ -531,8 +531,8 @@ body {
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  background: #D0DCC9;
-  color: #49664D;
+  background: #D9D2E5;
+  color: #625579;
   border-radius: 12px;
   font-size: 23px;
 }
@@ -544,12 +544,12 @@ body {
 .insight-section h3 {
   font-family: 'Manrope', sans-serif;
   font-size: 20px;
-  color: #334D39;
+  color: #514564;
   margin-bottom: 9px;
 }
 
 .insight-section p {
-  color: #6E7D6C;
+  color: #777083;
   font-size: 13px;
   line-height: 1.9;
   max-width: 800px;
@@ -562,7 +562,7 @@ body {
   max-width: 750px;
   margin: 88px auto 28px;
   padding: 38px 25px;
-  background: rgba(250,248,242,0.7);
+  background: rgba(251,249,253,0.75);
   border: 1px solid var(--border);
   border-radius: 17px;
 }
@@ -576,7 +576,7 @@ body {
 }
 
 .about-section p {
-  color: #788276;
+  color: #81798C;
   font-size: 14px;
   line-height: 1.9;
 }
@@ -586,13 +586,13 @@ body {
 .finora-footer {
   padding: 32px 8%;
   background: var(--forest-dark);
-  color: #D5DDD0;
+  color: #E0D9E8;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 20px;
   flex-wrap: wrap;
-  border-top: 3px solid #9C875F;
+  border-top: 3px solid #B89562;
 }
 
 .finora-footer .finora-logo {
@@ -601,12 +601,12 @@ body {
 
 .finora-footer p {
   font-size: 12px;
-  color: #C2CEC0;
+  color: #D1C9DC;
 }
 
 .finora-footer > span {
   font-size: 11px;
-  color: #B5C2B2;
+  color: #C4BBD0;
 }
 
 /* TABLET */
