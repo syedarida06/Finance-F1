@@ -1,16 +1,34 @@
-# React + Vite
+FINORA
+Financial Stability Platform for Delivery Partners
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+FINORA is a financial assistance and planning platform designed to help delivery partners manage irregular income, track actual earnings, prepare for financial uncertainties and improve their financial awareness.
 
-Currently, two official plugins are available:
+Problem Statement
+Delivery partners often face fluctuating daily earnings, unpredictable work-related expenses, limited emergency savings and difficulties accessing formal financial services due to the absence of a fixed monthly salary.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Key Features
 
-## React Compiler
+True Take-Home Income Tracker:** Calculates actual earnings after work-related expenses.
+Income Instability Alert: Identifies sudden drops in daily or monthly income.
+Essential Expense Shortfall Alert: Highlights potential gaps between income and essential expenses.
+Emergency Protection Fund: Encourages building financial reserves for unexpected situations.
+CreditBridge: Generates a financial report card summarizing income, expenses, savings and income consistency.
+Financial Insights & Planning: Helps users understand spending patterns and make informed financial decisions.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Tech Stack
 
-## Expanding the Oxlint configuration
+Frontend: React.js
+Backend: Node.js, Express.js
+Database: PostgreSQL
+Styling: CSS
+Version Control: Git & GitHub
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Future Scope :
+Bank Integration for CreditBridge: Connecting with banks and financial institutions to enable users to securely share their financial report cards and explore suitable credit opportunities.
+Bank & Digital Wallet Integration: Integrating bank accounts and digital payment platforms such as Google Pay and PhonePe to verify income and expense entries against actual transaction records.
+AI-Based Financial Prediction: Using AI to analyse historical financial patterns, predict income fluctuations and identify potential financial shortages.
+
+Project Vision :
+To empower delivery partners with better financial awareness, improved money management and greater financial stability.
+
+FINORA – Turning Irregular Earnings into Financial Stability.
