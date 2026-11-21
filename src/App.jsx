@@ -13,6 +13,7 @@ import ExpenseShortfall from "./pages/ExpenseShortfall";
 import EmergencyProtection from "./pages/EmergencyProtection";
 import ProtectionFund from "./pages/ProtectionFund";
 import IncomeSimulator from "./pages/IncomeSimulator";
+import CreditBridge from "./pages/CreditBridge";
 
 import MyAccount from "./pages/MyAccount";
 
@@ -37,6 +38,7 @@ function App() {
         <Route path="/expense-shortfall" element={<ExpenseShortfall />} />
         <Route path="/emergency-protection" element={<EmergencyProtection />} />
         <Route path="/protection-fund" element={<ProtectionFund />} />
+        <Route path="/credit-bridge" element={<CreditBridge />} />
 
         {/* Income Simulator */}
         <Route path="/income-simulator" element={<IncomeSimulator />} />

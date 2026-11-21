@@ -13,7 +13,8 @@ const {
   getInterruptions,
   addFundTransaction,
   getFund,
-  getIncomeStability
+  getIncomeStability,
+  getCreditBridge
 } = require("../controllers/featureController");
 
 // All feature routes require authentication
@@ -37,5 +38,8 @@ router.get("/fund", getFund);
 
 // Income Instability
 router.get("/income-stability", getIncomeStability);
+
+// CreditBridge
+router.get("/credit-bridge", getCreditBridge);
 
 module.exports = router;

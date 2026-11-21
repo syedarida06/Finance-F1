@@ -45,6 +45,14 @@ const features = [
     description: "Build a flexible reserve during good earning periods to manage lean months.",
     path: "/protection-fund",
     action: "Manage fund"
+  },
+  {
+    number: "06",
+    icon: "📄",
+    title: "CreditBridge – Financial Profile",
+    description: "Build a shareable financial profile using your saved income history, expenses and protection fund records.",
+    path: "/credit-bridge",
+    action: "View financial profile"
   }
 ];
 
@@ -111,6 +119,7 @@ function UserDashboard() {
         const fundData = await fundResponse.json();
 
         setUser(profileData.user || null);
+
         localStorage.setItem(
           "finoraUser",
           JSON.stringify(profileData.user || {})
@@ -471,13 +480,13 @@ function UserDashboard() {
 
         </section>
 
-        {/* FIVE FINORA FEATURES */}
+        {/* SIX FINORA FEATURES */}
         <section className="user-features">
           <div className="feature-heading">
             <div>
               <span className="section-eyebrow">BUILT FOR IRREGULAR INCOME</span>
               <h2>Your Financial Tools</h2>
-              <p>Five practical tools to help you manage uncertain earnings.</p>
+              <p>Six practical tools to help you manage uncertain earnings and build financial stability.</p>
             </div>
           </div>
 

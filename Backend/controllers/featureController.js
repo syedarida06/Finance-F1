@@ -320,6 +320,131 @@ const getIncomeStability = async (req, res) => {
   }
 };
 
+// 10. CREDITBRIDGE - FINANCIAL PROFILE
+const getCreditBridge = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Last 6 months of income records
+    const incomeResult = await pool.query(
+      `SELECT
+         TO_CHAR(DATE_TRUNC('month', record_date), 'YYYY-MM') AS month,
+         SUM(delivery_earnings + incentives) AS gross_income,
+         SUM(fuel + maintenance + parking + mobile_data + other_expenses)
+           AS work_expenses,
+         SUM(delivery_earnings + incentives -
+             fuel - maintenance - parking - mobile_data - other_expenses)
+           AS net_income,
+         COUNT(*) AS record_count
+       FROM income_records
+       WHERE user_id = $1
+       AND record_date >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5 months'
+       GROUP BY DATE_TRUNC('month', record_date)
+       ORDER BY DATE_TRUNC('month', record_date) ASC`,
+      [userId]
+    );
+
+    const history = incomeResult.rows.map(row => ({
+      month: row.month,
+      gross_income: Number(row.gross_income),
+      work_expenses: Number(row.work_expenses),
+      net_income: Number(row.net_income),
+      record_count: Number(row.record_count)
+    }));
+
+    const monthsWithRecords = history.length;
+
+    const averageMonthlyIncome = monthsWithRecords
+      ? history.reduce((sum, item) => sum + item.net_income, 0) /
+        monthsWithRecords
+      : 0;
+
+    const averageMonthlyWorkExpenses = monthsWithRecords
+      ? history.reduce((sum, item) => sum + item.work_expenses, 0) /
+        monthsWithRecords
+      : 0;
+
+    // Income consistency indicator
+    let incomeConsistency = null;
+
+    if (monthsWithRecords >= 2 && averageMonthlyIncome > 0) {
+      const variance = history.reduce(
+        (sum, item) =>
+          sum + Math.pow(item.net_income - averageMonthlyIncome, 2),
+        0
+      ) / monthsWithRecords;
+
+      const standardDeviation = Math.sqrt(variance);
+
+      incomeConsistency = Math.max(
+        0,
+        Math.min(
+          100,
+          Number(
+            (100 - (standardDeviation / averageMonthlyIncome) * 100)
+              .toFixed(1)
+          )
+        )
+      );
+    }
+
+    // Essential expenses due in the current month
+    const expenseResult = await pool.query(
+      `SELECT COALESCE(SUM(amount), 0) AS total
+       FROM essential_expenses
+       WHERE user_id = $1
+       AND due_date >= DATE_TRUNC('month', CURRENT_DATE)::date
+       AND due_date < (DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month')::date`,
+      [userId]
+    );
+
+    const currentMonthEssentialExpenses =
+      Number(expenseResult.rows[0].total);
+
+    // Protection Fund balance
+    const fundResult = await pool.query(
+      `SELECT COALESCE(SUM(
+         CASE
+           WHEN transaction_type = 'contribution' THEN amount
+           ELSE -amount
+         END
+       ), 0) AS balance
+       FROM protection_fund_transactions
+       WHERE user_id = $1`,
+      [userId]
+    );
+
+    const protectionFundBalance = Number(fundResult.rows[0].balance);
+
+    const estimatedSurplus =
+      averageMonthlyIncome - currentMonthEssentialExpenses;
+
+    res.json({
+      average_monthly_income: Number(averageMonthlyIncome.toFixed(2)),
+      average_monthly_work_expenses:
+        Number(averageMonthlyWorkExpenses.toFixed(2)),
+      income_consistency: incomeConsistency,
+      months_with_records: monthsWithRecords,
+      current_month_essential_expenses:
+        Number(currentMonthEssentialExpenses.toFixed(2)),
+      estimated_surplus:
+        Number(estimatedSurplus.toFixed(2)),
+      protection_fund_balance:
+        Number(protectionFundBalance.toFixed(2)),
+      income_history: history,
+      message: monthsWithRecords < 2
+        ? "Add income records across at least two months to assess income consistency."
+        : "Financial profile calculated from your saved FINORA records."
+    });
+
+  } catch (error) {
+    console.error("CreditBridge error:", error);
+    res.status(500).json({
+      message: "Unable to generate your financial profile."
+    });
+  }
+};
+
 module.exports = {
   addIncome,
   getIncome,
@@ -329,5 +454,6 @@ module.exports = {
   getInterruptions,
   addFundTransaction,
   getFund,
-  getIncomeStability
+  getIncomeStability,
+  getCreditBridge
 };
